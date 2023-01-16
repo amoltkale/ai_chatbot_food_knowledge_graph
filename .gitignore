@@ -1,7 +1,7 @@
 venv/*
-*.ini
 **/.ipynb_checkpoints/*
 *.csv
 *.json
 **/__pycache__/*
 data/*
+**/.DS_Store
