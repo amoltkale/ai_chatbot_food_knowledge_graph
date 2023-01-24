@@ -1,4 +1,4 @@
-arcgis==2.0.0
+arcgis==1.8.1
 cenpy==1.0.1
 CensusData==1.15.post1
 folium==0.14.0
