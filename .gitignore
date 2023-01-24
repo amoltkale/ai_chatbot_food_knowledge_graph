@@ -7,3 +7,4 @@ data/*
 ontologies
 resources
 **/.DS_Store
+scratch/*
