@@ -4,8 +4,10 @@ from pathlib import Path
 from owlready2 import *
 import pandas as pd
 
+
 def get_details_of_restriction(res):
-    return res.property,res.type,res.value
+    return res.property, res.type, res.value
+
 
 def create_transitionary_node(node_type, node_counter):
     # pass
@@ -18,7 +20,7 @@ def create_transitionary_node(node_type, node_counter):
     return node, node_counter
 
 
-def append_relation(rel_path:Path, source_id: str, target_id: str,
+def append_relation(rel_path: Path, source_id: str, target_id: str,
                     edge_type: str, restriction: str = ''):
     try:
         edge_label = ';'.join(edge_type.label)
@@ -33,8 +35,7 @@ def append_relation(rel_path:Path, source_id: str, target_id: str,
         rel_writer.writerow(rel_line)
 
 
-
-def append_node(node, node_path:Path, *, node_type:str=''):
+def append_node(node, node_path: Path, *, node_type: str = ''):
     '''
     input:
         node:
@@ -69,15 +70,18 @@ def parse_logic(node_path, rel_path, unknown_node, known_node, edge_type, restri
             append_node(unknown_node, node_path, node_type="Concept")
             if isinstance(known_node, str) and ("AND" in known_node or "OR" in known_node):
                 # AND/OR nodes are the targets of classes in conjunctons
-                append_relation(rel_path, unknown_node, known_node, edge_type, restriction_type)
+                append_relation(rel_path, unknown_node,
+                                known_node, edge_type, restriction_type)
             else:
-                append_relation(rel_path, known_node, unknown_node, edge_type, restriction_type)
+                append_relation(rel_path, known_node,
+                                unknown_node, edge_type, restriction_type)
         case owlready2.class_construct.And:
-            ## AND Node creation
+            # AND Node creation
             and_node, and_count = create_transitionary_node('AND', and_count)
             append_node(and_node, node_path, node_type='AND')
             # made edge between AND and known
-            append_relation(rel_path, known_node, and_node, edge_type, restriction_type)
+            append_relation(rel_path, known_node, and_node,
+                            edge_type, restriction_type)
 
             # Iterate through AND list
             for connected_node in unknown_node.is_a:
@@ -87,11 +91,12 @@ def parse_logic(node_path, rel_path, unknown_node, known_node, edge_type, restri
                                                                           and_count, or_count, blank_count, not_count)
 
         case owlready2.class_construct.Or:
-            ## AND Node creation
+            # AND Node creation
             or_node, or_count = create_transitionary_node('OR', or_count)
             append_node(or_node, node_path, node_type='OR')
             # made edge between OR and known
-            append_relation(rel_path, known_node, or_node, edge_type, restriction_type)
+            append_relation(rel_path, known_node, or_node,
+                            edge_type, restriction_type)
 
             # Iterate through OR list
             for connected_node in unknown_node.Classes:
@@ -101,14 +106,17 @@ def parse_logic(node_path, rel_path, unknown_node, known_node, edge_type, restri
                                                                           and_count, or_count, blank_count, not_count)
 
         case owlready2.class_construct.Restriction:
-            ## BLANK Node Creatiom
-            blank_node, blank_count = create_transitionary_node('BLANK', blank_count)
+            # BLANK Node Creatiom
+            blank_node, blank_count = create_transitionary_node(
+                'BLANK', blank_count)
             append_node(blank_node, node_path, node_type='BLANK')
             # make edge between known and blank
-            append_relation(rel_path, blank_node, known_node, edge_type, restriction_type)
+            append_relation(rel_path, blank_node, known_node,
+                            edge_type, restriction_type)
 
             # Get values out of restriction
-            edge_label, restriction, new_unknown_type = get_details_of_restriction(unknown_node)
+            edge_label, restriction, new_unknown_type = get_details_of_restriction(
+                unknown_node)
 
             match restriction:
                 case 24:  # SOME
@@ -129,17 +137,19 @@ def parse_logic(node_path, rel_path, unknown_node, known_node, edge_type, restri
                     raise NotImplementedError
 
             assert isinstance(edge_label, owlready2.prop.ObjectPropertyClass) or \
-                   isinstance(edge_label, owlready2.prop.DataPropertyClass), f"{edge_label} {type(edge_label)}"
+                isinstance(
+                    edge_label, owlready2.prop.DataPropertyClass), f"{edge_label} {type(edge_label)}"
             and_count, or_count, blank_count, not_count = parse_logic(node_path, rel_path, new_unknown_type, blank_node, edge_label,
                                                                       restriction_name,
                                                                       and_count, or_count, blank_count, not_count)
 
         case owlready2.class_construct.Not:
-            ## Not Node Creatiom
+            # Not Node Creatiom
             not_node, not_count = create_transitionary_node('NOT', not_count)
             append_node(not_node, node_path, node_type='NOT')
             # make edge between known and blank
-            append_relation(rel_path, not_node, known_node, edge_type, restriction_type)
+            append_relation(rel_path, not_node, known_node,
+                            edge_type, restriction_type)
 
             # Get values out of restriction
             and_count, or_count, blank_count, not_count = parse_logic(node_path, rel_path, unknown_node.Class, not_node, "member_of",
@@ -188,7 +198,8 @@ def main():
 
         if response == "y":
             if Path(node_path).is_file():
-                print(f"There exists a node and relations file for {onto_name}, are you sure you want to continue? The existing file will be deleted. y/n")
+                print(
+                    f"There exists a node and relations file for {onto_name}, are you sure you want to continue? The existing file will be deleted. y/n")
                 response = input()
                 if response == "y":
                     os.remove(node_path)
@@ -197,13 +208,15 @@ def main():
                     continue
 
             with open(node_path, 'w') as csvfile:
-                fieldnames = ['node_id:ID', 'descriptive_label:string[]', 'iri', ':LABEL']
+                fieldnames = ['node_id:ID',
+                              'descriptive_label:string[]', 'iri', ':LABEL']
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
                 writer.writeheader()
 
             with open(rel_path, 'w') as csvfile:
-                fieldnames = [':START_ID', ':END_ID', ':TYPE', 'restriction', 'label']
+                fieldnames = [':START_ID', ':END_ID',
+                              ':TYPE', 'restriction', 'label']
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
                 writer.writeheader()
@@ -218,6 +231,7 @@ def main():
             rel_df = pd.read_csv(rel_path)
             rel_df.drop_duplicates(inplace=True)
             rel_df.to_csv(rel_path, index=False)
+
 
 if __name__ == "__main__":
     main()
