@@ -3,8 +3,10 @@ venv*/*
 *.csv
 *.json
 **/__pycache__/*
-data/*
-ontologies
+ontologies/data/input/*
+!ontologies/data/input/.gitkeep
+ontologies/data/output/*
+!ontologies/data/output/.gitkeep
 resources
 **/.DS_Store
 scratch/*
