@@ -2,6 +2,7 @@ venv*/*
 **/.ipynb_checkpoints/*
 *.csv
 *.json
+*.xlsx
 **/__pycache__/*
 ontologies/data/input/*
 !ontologies/data/input/.gitkeep
@@ -10,3 +11,4 @@ ontologies/data/output/*
 resources
 **/.DS_Store
 scratch/*
+data*/*

@@ -9,5 +9,6 @@ matplotlib==3.6.3
 Owlready2==0.39
 pandas==1.5.2
 psycopg2==2.9.5
+scikit-learn==1.2.1
 SQLAlchemy==1.4.46
 
