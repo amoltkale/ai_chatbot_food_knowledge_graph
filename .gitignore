@@ -10,5 +10,5 @@ ontologies/data/output/*
 !ontologies/data/output/.gitkeep
 resources
 **/.DS_Store
-scratch/*
+**/scratch/*
 data*/*
