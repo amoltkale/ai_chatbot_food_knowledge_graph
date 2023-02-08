@@ -71,7 +71,7 @@ def append_relation(rel_p: Path, source_id:str, target_id:str,
 
 def create_transition(node_p, counter_dict, counter_key):
     # create node and append to file
-    trans_node = f"{counter_dict['node_prefix']}_{counter_dict[counter_key]}".upper()
+    trans_node = f"{counter_dict['node_prefix']}_{counter_key}_{counter_dict[counter_key]}".upper()
     append_node(trans_node,node_p,node_type=counter_key.upper())
     # update counter
     counter_dict[counter_key] = counter_dict[counter_key] + 1
