@@ -4,11 +4,14 @@ venv*/*
 *.json
 *.xlsx
 **/__pycache__/*
-ontologies/data/input/*
-!ontologies/data/input/.gitkeep
-ontologies/data/output/*
-!ontologies/data/output/.gitkeep
+ontologies/*
 resources
 **/.DS_Store
+<<<<<<< HEAD
 **/scratch/*
 data*/*
+=======
+scratch/*
+data*/*
+arc_gis/output.zip
+>>>>>>> main
