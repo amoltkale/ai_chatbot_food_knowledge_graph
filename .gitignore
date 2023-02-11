@@ -4,10 +4,7 @@ venv*/*
 *.json
 *.xlsx
 **/__pycache__/*
-ontologies/data/input/*
-!ontologies/data/input/.gitkeep
-ontologies/data/output/*
-!ontologies/data/output/.gitkeep
+ontologies/*
 resources
 **/.DS_Store
 scratch/*
