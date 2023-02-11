@@ -4,7 +4,6 @@ venv*/*
 *.json
 *.xlsx
 **/__pycache__/*
-ontologies/*
 resources
 **/.DS_Store
 <<<<<<< HEAD
