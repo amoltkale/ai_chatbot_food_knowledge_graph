@@ -25,14 +25,18 @@ def main():
     out_p = args.in_path.parent / "out"
     out_p.mkdir(exist_ok=True)
 
-    path_dict = {"node": out_p / "nodes.csv",
-                 "rel": out_p / "rels.csv",
-                 "err": out_p / "error_log.csv"}
+    path_dict = {"node":    out_p / "nodes.csv",
+                 "rel":     out_p / "rels.csv",
+                 "err":     out_p / "error_log.csv",
+                #  "pattern": out_p / "rest_detail_pattern.csv"
+                 "pattern": out_p / "pattern.csv"}
 
     # create csvs for neo4j
     create_csvs(path_dict)
 
     # load ontology
+    # must cast as str since get_ontology throws error
+    # AttributeError: 'PosixPath' object has no attribute 'endswith'
     onto = get_ontology(str(args.in_path)).load()
 
     # parse ontology

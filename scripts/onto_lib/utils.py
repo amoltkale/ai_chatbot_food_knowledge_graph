@@ -26,6 +26,14 @@ def create_csvs(path_dict: dict):
                     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
                     writer.writeheader()
+            case "pattern":
+                with open(path_dict[k], 'w') as csvfile:
+                    fieldnames = ['pattern', 'node_id:ID', 'iri']
+                    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+                    writer.writeheader()
+            case _:
+                raise ValueError(f"Unknown path: {k}. Expected node, rel, err, or pattern")
 
 def append_node(node, node_p:Path, *, node_type:str=''):
     '''
@@ -81,7 +89,7 @@ def get_details_of_restriction(res):
     return res.property,res.type,res.value
 
 def parse_logic(path_dict, unknown_node, known_node, edge_type, restriction_type, restriction_value,
-                counter_dict, premature_nodes):
+                counter_dict, premature_nodes, logic_pattern):
     match unknown_node:
         case owlready2.entity.ThingClass():
             # case: stop rule
@@ -102,7 +110,9 @@ def parse_logic(path_dict, unknown_node, known_node, edge_type, restriction_type
                 append_relation(path_dict["rel"], unknown_node, known_node, edge_type, restriction_type, restriction_value)
             else:
                 append_relation(path_dict["rel"], known_node, unknown_node, edge_type, restriction_type, restriction_value)
-        
+
+            # Add pattern
+            logic_pattern = logic_pattern + "Concept"
         case owlready2.prop.ObjectPropertyClass():
             append_node(unknown_node,path_dict["node"],node_type="Property")
             if isinstance(known_node, str) and ("AND" in known_node or "OR" in known_node):
@@ -110,8 +120,11 @@ def parse_logic(path_dict, unknown_node, known_node, edge_type, restriction_type
                 append_relation(path_dict["rel"], known_node, unknown_node, edge_type, restriction_type, restriction_value)
             else:
                 append_relation(path_dict["rel"], unknown_node, known_node, edge_type, restriction_type, restriction_value)
+            logic_pattern = logic_pattern + "Property"
 
         case owlready2.class_construct.And():
+            # Add pattern
+            logic_pattern = logic_pattern + "AND("
             ## AND Node creation
             counter_key = "and"
             trans_node, counter_dict = create_transition(path_dict["node"], counter_dict, counter_key)
@@ -121,10 +134,11 @@ def parse_logic(path_dict, unknown_node, known_node, edge_type, restriction_type
             # Iterate through AND list
             for connected_node in unknown_node.is_a:
                 # make recursion call on connected node
-                counter_dict, premature_nodes = parse_logic(path_dict, connected_node, trans_node, "member_of",
-                    restriction_type, restriction_value, counter_dict, premature_nodes)
-                
+                counter_dict, premature_nodes, logic_pattern = parse_logic(path_dict, connected_node, trans_node, "member_of",
+                    restriction_type, restriction_value, counter_dict, premature_nodes, logic_pattern)
+            logic_pattern = logic_pattern + ")"
         case owlready2.class_construct.Or():
+            logic_pattern = logic_pattern + "OR("
             counter_key = "or"
             trans_node, counter_dict = create_transition(path_dict["node"], counter_dict, counter_key)
             # link to known
@@ -133,9 +147,9 @@ def parse_logic(path_dict, unknown_node, known_node, edge_type, restriction_type
             # Iterate through OR list
             for connected_node in unknown_node.Classes:
                 # make recursion call on connected node
-                counter_dict, premature_nodes = parse_logic(path_dict, connected_node, trans_node, "member_of",
-                    restriction_type, restriction_value, counter_dict, premature_nodes)
-
+                counter_dict, premature_nodes, logic_pattern = parse_logic(path_dict, connected_node, trans_node, "member_of",
+                    restriction_type, restriction_value, counter_dict, premature_nodes, logic_pattern)
+            logic_pattern = logic_pattern + ")"
         case owlready2.class_construct.Restriction():
             ## BLANK Node Creatiom
             counter_key = "blank"
@@ -169,12 +183,18 @@ def parse_logic(path_dict, unknown_node, known_node, edge_type, restriction_type
                     print(unknown_node)
                     raise NotImplementedError
 
+            # logic_pattern = logic_pattern + restriction_name + "("
+            logic_pattern = logic_pattern + "RESTRICTION("
+
             assert isinstance(edge_label, owlready2.prop.ObjectPropertyClass) or \
                     isinstance(edge_label, owlready2.prop.DataPropertyClass), f"{edge_label} {type(edge_label)}"
-            counter_dict, premature_nodes = parse_logic(path_dict, new_unknown_type, trans_node, edge_label,
-                restriction_name, restr_value, counter_dict, premature_nodes)
+            counter_dict, premature_nodes, logic_pattern = parse_logic(path_dict, new_unknown_type, trans_node, edge_label,
+                restriction_name, restr_value, counter_dict, premature_nodes, logic_pattern)
+
+            logic_pattern = logic_pattern + ")"
 
         case owlready2.class_construct.Not():
+            logic_pattern = logic_pattern + "NOT("
             ## Not Node Creation
             counter_key = "not"
             trans_node, counter_dict = create_transition(path_dict["node"], counter_dict, counter_key)
@@ -182,10 +202,11 @@ def parse_logic(path_dict, unknown_node, known_node, edge_type, restriction_type
             append_relation(path_dict["rel"], trans_node, known_node, edge_type, restriction_type, restriction_value)
             
             # Get values out of restriction
-            counter_dict, premature_nodes = parse_logic(path_dict, unknown_node.Class, trans_node, "member_of",
-                restriction_type, restriction_value, counter_dict, premature_nodes)
-            
+            counter_dict, premature_nodes, logic_pattern = parse_logic(path_dict, unknown_node.Class, trans_node, "member_of",
+                restriction_type, restriction_value, counter_dict, premature_nodes, logic_pattern)
+            logic_pattern = logic_pattern + ")"
         case owlready2.class_construct.OneOf():
+            logic_pattern = logic_pattern + "OneOf("
             ## OneOf Node creation
             counter_key = "OneOf"
             trans_node, counter_dict = create_transition(path_dict["node"], counter_dict, counter_key)
@@ -200,10 +221,10 @@ def parse_logic(path_dict, unknown_node, known_node, edge_type, restriction_type
                 # types.new_class(connected_node.name, (Thing,))
                 
                 # make recursion call on connected node
-                counter_dict, premature_nodes = parse_logic(path_dict, 
+                counter_dict, premature_nodes, logic_pattern = parse_logic(path_dict, 
                     types.new_class(connected_node.name, (Thing,)), trans_node, 
-                    "member_of", restriction_type, restriction_value, counter_dict, premature_nodes)
-
+                    "member_of", restriction_type, restriction_value, counter_dict, premature_nodes, logic_pattern)
+            logic_pattern = logic_pattern + ")"
         case type() | bool() | None:
             '''
             Tends to come from poorly defined restrictions
@@ -225,6 +246,7 @@ def parse_logic(path_dict, unknown_node, known_node, edge_type, restriction_type
                 append_node(unknown_node,path_dict["node"],node_type="Nothing")
             else:
                 append_node(unknown_node,path_dict["node"],node_type="Thing")
+            logic_pattern = logic_pattern + "Concept"
         case _:
             # print out type
             # print(f"node: {c} Unknown type: {type(unknown_node)} on {c.iri}")
@@ -234,7 +256,7 @@ def parse_logic(path_dict, unknown_node, known_node, edge_type, restriction_type
                 err_writer.writerow(row)
             # pass
             raise TypeError(f"Unknown type: {type(unknown_node)}")
-    return counter_dict, premature_nodes
+    return counter_dict, premature_nodes, logic_pattern
 
 def parse_ontology(path_dict, onto, *, node_prefix="upper"):
     # create node counters
@@ -257,12 +279,16 @@ def parse_ontology(path_dict, onto, *, node_prefix="upper"):
         # check if equivalence is not empty
         if list(c.equivalent_to):
             for sc in c.equivalent_to:
-                counter_dict, premature_nodes = parse_logic(path_dict,
-                    sc, c, "equivalent_to", "", "", counter_dict, premature_nodes)
+                logic_pattern = "Concept"
+                counter_dict, premature_nodes, logic_pattern = parse_logic(path_dict,
+                    sc, c, "equivalent_to", "", "", counter_dict, premature_nodes, logic_pattern)
+                append_pattern(path_dict["pattern"], [[logic_pattern], c, c.iri])
         elif list(c.is_a):
             for sc in c.is_a:
-                counter_dict, premature_nodes = parse_logic(path_dict,
-                    sc, c, "is_a", "", "", counter_dict, premature_nodes)
+                logic_pattern = "Concept"
+                counter_dict, premature_nodes, logic_pattern = parse_logic(path_dict,
+                    sc, c, "is_a", "", "", counter_dict, premature_nodes, logic_pattern)
+                append_pattern(path_dict["pattern"], [[logic_pattern], c, c.iri])
         else:
             print(f"{c} does not have equivalent_to or is_a properties.")
 
@@ -272,8 +298,10 @@ def parse_ontology(path_dict, onto, *, node_prefix="upper"):
         # check if equivalence is not empty
         if list(p.subclasses()):
             for sp in p.subclasses():
-                counter_dict, premature_nodes = parse_logic(path_dict,
-                    sp, p, "subproperty_of", "", "", counter_dict, premature_nodes)
+                logic_pattern = "Property"
+                counter_dict, premature_nodes, logic_pattern = parse_logic(path_dict,
+                    sp, p, "subproperty_of", "", "", counter_dict, premature_nodes, logic_pattern)
+                append_pattern(path_dict["pattern"], [[logic_pattern], p, p.iri])
 
     # Clean up any issues with the csvs
     clean_csvs(path_dict, premature_nodes)
@@ -300,3 +328,8 @@ def clean_csvs(path_dict, premature_nodes):
     rel_df.to_csv(path_dict['rel'],index=False)
     print(f"Final node count: {node_df.shape[0]}")
     print(f"Final rel count: {rel_df.shape[0]}")
+
+def append_pattern(pattern_p: Path, pattern: str):
+    with open(pattern_p, 'a') as f:
+        wtr = csv.writer(f, delimiter=',')
+        wtr.writerow(pattern)
