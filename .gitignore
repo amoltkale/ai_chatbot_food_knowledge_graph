@@ -6,11 +6,6 @@ venv*/*
 **/__pycache__/*
 resources
 **/.DS_Store
-<<<<<<< HEAD
 **/scratch/*
 data*/*
-=======
-scratch/*
-data*/*
 arc_gis/output.zip
->>>>>>> main
