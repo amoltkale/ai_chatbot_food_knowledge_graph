@@ -1,3 +1,22 @@
+# Recursive Query: 2_deep_apple
+```sql
+MATCH p=(n)-[r]->(c)
+WHERE n.iri =~ ".*FOODON_03310788.*"
+WITH c
+MATCH p2=(c)<-[r2 *1..2]-(other)
+    WHERE LABELS(other) = ["Concept"]
+RETURN p2
+```
+
+# Recursive Query: 2_deep_sausage
+```sql
+MATCH p=(n)-[r]->(c)
+WHERE n.iri =~ ".*FOODON_00001007.*"
+WITH c
+MATCH p2=(c)<-[r2 *1..2]-(other)
+    WHERE LABELS(other) = ["Concept"]
+RETURN p2
+```
 # Find whole/part apple
 ```sql
 MATCH (n:Concept)
