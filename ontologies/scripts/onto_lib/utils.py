@@ -271,6 +271,9 @@ def parse_logic(path_dict, unknown_node, known_node, edge_type, restriction_type
     return counter_dict, premature_nodes, logic_pattern, descendents
 
 def parse_ontology(path_dict, onto, *, node_prefix="upper"):
+    '''
+    TODO: Add node set to track nodes that have already been written out to prevent duplications in csv
+    '''
     # create node counters
     counter_dict = {k: 0 for k in ["and", "or", "blank", "not", "OneOf"]}
     counter_dict["node_prefix"] = node_prefix
