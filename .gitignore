@@ -9,3 +9,5 @@ resources
 **/scratch/*
 data*/*
 arc_gis/output.zip
+*.xlsx*
+*.zip*
