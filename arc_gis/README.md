@@ -19,3 +19,14 @@ https://geoenrichdev.arcgis.com/arcgis/rest/services/World/GeoenrichmentServer/G
 ##### 
 
 
+
+
+#### `Geocoding`
+##### `Listing `
+https://developers.arcgis.com/python/guide/part1-what-is-geocoding/#what-are-geocoders-and-their-types  
+`categories property`  
+The categories property can be used to limit result to one or more categories. For example, "Populated Place" or "Scandinavian Food". It is only applicable to the World Geocoding Service. The following code lists the entire hierarchy of supported category values.
+
+
+## Found Sample notebooks
+https://github.com/Esri/arcgis-python-api  
