@@ -34,6 +34,13 @@ def create_csvs(path_dict: dict):
                     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
                     writer.writeheader()
+            case "annot":
+                pass
+            #     with open(path_dict[k], 'w') as csvfile:
+            #         fieldnames = ['class', 'node_id:ID', 'iri']
+            #         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+            #         writer.writeheader()
             case "pattern_json":
                 pass
             case _:
@@ -91,6 +98,36 @@ def create_transition(node_p, counter_dict, counter_key):
 
 def get_details_of_restriction(res):
     return res.property,res.type,res.value
+
+def get_annots(c, annot_p):
+    for class_prop in c.get_class_properties():
+        match class_prop:
+            case owlready2.annotation.AnnotationPropertyClass():
+                '''
+                ValueError: Cannot read literal of datatype 570!: obo.IAO_0000117, obo.IAO_0000119
+                ValueError: Cannot read literal of datatype 571!: rdf-schema.label
+                ValueError: Cannot read literal of datatype 576! 1.1.date
+                ValueError: Cannot read literal of datatype 6103!: oboInOwl.hasDbXref
+                '''
+
+                if str(class_prop) != "rdf-schema.label" and str(class_prop) != "oboInOwl.hasDbXref" \
+                        and str(class_prop) != "obo.IAO_0000117" and str(class_prop) != "1.1.date" \
+                        and str(class_prop) != "obo.IAO_0000119":
+                    p_str = ""
+                    for i, p_item in enumerate(class_prop.__getitem__(c)):
+                        if i != 0:
+                            p_str = p_str + ";" + str(p_item)
+                        else:
+                            p_str = str(p_item)
+                    row = [str(c), str(class_prop), p_str]
+                    with open(annot_p, 'a') as f:
+                        writer = csv.writer(f, delimiter=',')
+                        writer.writerow(row)
+
+            case owlready2.prop.ObjectPropertyClass() | owlready2.prop.DataPropertyClass():
+                pass
+            case _:
+                raise TypeError(f"Unknown type: {type(class_prop)}")
 
 def parse_logic(path_dict, unknown_node, known_node, edge_type, restriction_type, restriction_value,
                 counter_dict, premature_nodes, logic_pattern, descendents):
@@ -267,7 +304,7 @@ def parse_logic(path_dict, unknown_node, known_node, edge_type, restriction_type
                 err_writer = csv.writer(f, delimiter=',')
                 err_writer.writerow(row)
             # pass
-            raise TypeError(f"Unknown type: {type(unknown_node)}")
+            # raise TypeError(f"Unknown type: {type(unknown_node)}")
     return counter_dict, premature_nodes, logic_pattern, descendents
 
 def parse_ontology(path_dict, onto, *, node_prefix="upper"):
@@ -316,6 +353,8 @@ def parse_ontology(path_dict, onto, *, node_prefix="upper"):
                 pattern_dict = add_index(pattern_dict, logic_pattern, str(c), descendents)
         else:
             print(f"{c} does not have equivalent_to or is_a properties.")
+
+        get_annots(c, path_dict["annot"])
 
 
 
