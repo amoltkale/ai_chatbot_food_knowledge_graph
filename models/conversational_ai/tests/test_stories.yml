@@ -1,0 +1,38 @@
+#### This file contains tests to evaluate that your bot behaves as expected.
+#### If you want to learn more, please see the docs: https://rasa.com/docs/rasa/testing-your-assistant
+
+stories:
+- story: happy path 1
+  steps:
+  - user: |
+      hello there!
+    intent: greet
+  - action: utter_greet
+  - user: |
+      I'm looking for an investor to help expand my restaurant Food is Good
+    intent: business_capitol
+    entities:
+      - current_business_name: "Food is Good"
+
+- story: Business Capitol Example One
+  steps:
+  - user: |
+      hello there!
+    intent: greet
+  - action: utter_greet
+  - user: |
+      I'm looking for an investor to help expand my restaurant
+    intent: business_capitol
+
+stories:
+- story: Business Capitol Example Two
+  steps:
+  - user: |
+      hello there!
+    intent: greet
+  - action: utter_greet
+  - user: |
+      I'm looking for funding for my business Bird Rock Coffee Roasters
+    intent: business_capitol
+    entities:
+      - current_business_name: "Food is Good"

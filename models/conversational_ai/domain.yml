@@ -1,0 +1,62 @@
+version: "3.1"
+
+intents:
+  - greet
+  - goodbye
+  - affirm
+  - deny
+  - mood_great
+  - mood_unhappy
+  - bot_challenge
+  - business_capitol
+  - inform
+  - business_partner
+  - market_demand_profile
+  - supply_chain
+  - legal_requirements
+
+entities:
+  - current_business_name
+
+slots:
+  current_business_name:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: current_business_name
+        intent: utter_business_capitol
+
+responses:
+  utter_greet:
+  - text: "Hey! How can I help you?"
+
+  utter_did_that_help:
+  - text: "Did that help you?"
+
+  utter_happy:
+  - text: "Great, carry on!"
+
+  utter_goodbye:
+  - text: "Bye, have a nourished day!"
+
+  utter_iamabot:
+  - text: "I am a bot, powered by Rasa."
+
+  utter_business_capitol:
+  - text: "Sure! I can help connect you with funding resources. First, I need to ask a few questions."
+
+  utter_business_partner:
+  - text: "Sure! I can help you find contacts of people with similar interests. First, I need to ask a few questions."
+
+  utter_market_demand_profile:
+  - text: "Sure, I can help create a market demand profile. First, I need to ask a few questions"
+
+  utter_supply_chain:
+  - text: "Sure! I can connect you with different supply chain services. First, I need to ask a few questions."
+
+  utter_legal_requirements:
+  - text: "Sure! I can help guide you through legal requirements. First, I need to ask a few questions."
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true

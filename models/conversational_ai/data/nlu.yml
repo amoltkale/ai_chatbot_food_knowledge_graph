@@ -1,0 +1,106 @@
+version: "3.1"
+
+nlu:
+- intent: greet
+  examples: |
+    - hey
+    - hello
+    - hi
+    - hello there
+    - good morning
+    - good evening
+    - moin
+    - hey there
+    - let's go
+    - hey dude
+    - goodmorning
+    - goodevening
+    - good afternoon
+
+- intent: goodbye
+  examples: |
+    - cu
+    - good by
+    - cee you later
+    - good night
+    - bye
+    - goodbye
+    - have a nice day
+    - see you around
+    - bye bye
+    - see you later
+
+- intent: affirm
+  examples: |
+    - yes
+    - y
+    - indeed
+    - of course
+    - that sounds good
+    - correct
+
+- intent: deny
+  examples: |
+    - no
+    - n
+    - never
+    - I don't think so
+    - don't like that
+    - no way
+    - not really
+
+- intent: bot_challenge
+  examples: |
+    - are you a bot?
+    - are you a human?
+    - am I talking to a bot?
+    - am I talking to a human?
+
+- intent: inform
+  examples: |
+    - I own a restaurant called [Yummy Food](current_business_name)
+    - I own [Bird Rock Coffee Roasters](current_business_name) 
+    - My business named [Pizza by the Slice](current_business_name)
+    - I own a business called [Vons](current_business_name)
+
+- intent: business_capitol
+  examples: |
+    - I would like help finding financing 
+    - Can you connect me to some investors?
+    - Hi I have a business [Food is Good](current_business_name) that I'm looking to expand
+    - I would like help finding funding
+    - I would like to find finding for my restaurant [Mexican Food](current_business_name)
+    - Can you connect me with resources to find more funding for [My Restaurant](current_business_name)
+    - I own a restaurant called [Yummy Food](current_business_name) and I'm looking to expand
+    - I own [Bird Rock Coffee Roasters](current_business_name) and I need a loan
+    - Hi I need help finding capitol to help expand my business
+    - Hi I need help finding capitol to help expand my business [Subway](current_business_name)
+    - I'm seeking financial assistance for my store [Safeway](current_business_name)
+    - financing
+    - funding
+    - capitol
+    - business capitol
+
+- intent: business_partner
+  examples: |
+    - I would like help finding a business partner
+    - I'm looking for a business partner
+    - Do you have any suggestions for people to partner with for business
+    
+- intent: market_demand_profile
+  examples: |
+    - Can you generate a market demand profile 
+    - I need help creating a market demand profile 
+    - market demand profile, please
+
+- intent: supply_chain
+  examples: |
+    - Can you help me connect to people selling products
+    - I'm looking for new vendors for my business
+    - I would like to expand my supply chain network
+
+- intent: legal_requirements
+  examples: |
+    - Can I get help finding legal requirements for starting a business
+    - What are the requirements for starting a restaurant in San Diego? 
+
