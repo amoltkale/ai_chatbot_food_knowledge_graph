@@ -13,7 +13,7 @@ def create_csvs(path_dict: dict):
         match k:
             case "node":
                 with open(path_dict[k], 'w') as csvfile:
-                    fieldnames = ['node_id:ID', 'descriptive_label:string[]', 'iri', ':LABEL']
+                    fieldnames = ['node_id:ID', 'label:string[]', 'iri', ':LABEL']
                     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
                     writer.writeheader()
             case "rel":
@@ -35,7 +35,11 @@ def create_csvs(path_dict: dict):
 
                     writer.writeheader()
             case "annot":
-                pass
+                with open(path_dict[k], 'w') as csvfile:
+                    fieldnames = ['node_id:ID', 'annot_label', 'annot']
+                    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                    writer.writeheader()
+                # pass
             #     with open(path_dict[k], 'w') as csvfile:
             #         fieldnames = ['class', 'node_id:ID', 'iri']
             #         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -104,25 +108,35 @@ def get_annots(c, annot_p):
         match class_prop:
             case owlready2.annotation.AnnotationPropertyClass():
                 '''
+                The examples why extracting the annotations need to be in a try block:
                 ValueError: Cannot read literal of datatype 570!: obo.IAO_0000117, obo.IAO_0000119
                 ValueError: Cannot read literal of datatype 571!: rdf-schema.label
                 ValueError: Cannot read literal of datatype 576! 1.1.date
                 ValueError: Cannot read literal of datatype 6103!: oboInOwl.hasDbXref
                 '''
 
-                if str(class_prop) != "rdf-schema.label" and str(class_prop) != "oboInOwl.hasDbXref" \
-                        and str(class_prop) != "obo.IAO_0000117" and str(class_prop) != "1.1.date" \
-                        and str(class_prop) != "obo.IAO_0000119":
+                try:
                     p_str = ""
-                    for i, p_item in enumerate(class_prop.__getitem__(c)):
-                        if i != 0:
-                            p_str = p_str + ";" + str(p_item)
+                    for p_item in class_prop.__getitem__(c):
+                        if p_item is None:
+                            continue
+                        if len(p_str) > 0:
+                            p_str = p_str + "###" + str(p_item)
                         else:
                             p_str = str(p_item)
-                    row = [str(c), str(class_prop), p_str]
+                    if p_str == "None":
+                        continue
+                    # check name of annotation
+                    if class_prop.label.first() is None:
+                        annot_str = str(class_prop)
+                    else:
+                        annot_str = class_prop.label.first()
+                    row = [str(c), annot_str, p_str]
                     with open(annot_p, 'a') as f:
                         writer = csv.writer(f, delimiter=',')
                         writer.writerow(row)
+                except:
+                    pass
 
             case owlready2.prop.ObjectPropertyClass() | owlready2.prop.DataPropertyClass():
                 pass
