@@ -47,12 +47,35 @@ check node list generated from primitive type match
 write out cleaned csv
 
 # neo4j
+1. Add `nodes.csv`, `rels.csv`, and `annots.csv` to the `import` directory in the neo4j project
+2. Run the import command below to load `nodes` and `rels` into the database
+3. Then run the queries to add annotations
+
 ## import
 ```bash
 ./bin/neo4j-admin database import full --trim-strings=true neo4j \
 --overwrite-destination --nodes=import/nodes.csv \
 --relationships=import/rels.csv
 ```
+
+## Add annotations
+### Create index
+```sql
+CREATE TEXT INDEX node_index
+FOR (n:Concept)
+ON (n.node_id)
+```
+
+### Add annotations (this takes roughly an hour)
+```sql
+LOAD CSV WITH HEADERS FROM 'file:///annot.csv' AS row
+MATCH (n:Concept {node_id: row.node_id})
+WITH n, row
+CALL apoc.create.setProperty(n, row.annot_label, [x in apoc.text.split(row.annot, '###')])
+YIELD node
+RETURN COUNT(*)
+```
+
 ## create full text index
 ```
 CREATE FULLTEXT INDEX label_index
