@@ -1,0 +1,20 @@
+pyogrio==0.5.1 # Vectorized spatial vector file format I/O using GDAL/OGR
+numpy==1.19.5 
+psycopg2-binary==2.9.5 # Python-PostgreSQL Database Adapter
+ipywidgets==7.6.0 #IPython HTML widgets for Jupyter
+hyper==0.7.0 #HTTP/2 Client for Python
+#openpyxl==3.1.0
+arcgis==2.1.0 # ArcGIS API for Python
+cenpy==1.0.1 # Explore and download data from Census APIs
+CensusData==1.15.post1
+folium==0.14.0 # Make beautiful maps with Leaflet.js & Python
+jupyterlab==3.5.2
+mapclassify==2.5.0
+matplotlib==3.6.3
+Owlready2==0.39
+pandas==1.4.4
+psycopg2==2.9.5
+scikit-learn==1.2.1
+seaborn==0.12.2
+SQLAlchemy==1.4.46
+

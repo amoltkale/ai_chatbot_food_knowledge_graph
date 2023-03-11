@@ -5,7 +5,16 @@
 1. `San Diego County`  
 2. `Imperial County`  
   
-### Some important Links  
+### Some important Links 
+
+##### `Data Browser for Analysis Variables in ARC GIS`  
+https://doc.arcgis.com/en/esri-demographics/latest/data-browser/data-browser.htm
+
+
+##### `Esri U.S. data fact sheet`
+https://doc.arcgis.com/en/esri-demographics/latest/get-started/us-data-fact-sheet.htm  
+
+
 ##### `Cenpy API documentation`
 https://nbviewer.org/github/cenpy-devs/cenpy/blob/master/notebooks/product-api.ipynb  
 
