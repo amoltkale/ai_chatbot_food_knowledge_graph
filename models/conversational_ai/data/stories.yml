@@ -1,0 +1,50 @@
+version: "3.1"
+
+stories:
+
+- story: Business Capitol Intent
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: business_capitol
+  - action: utter_business_capitol
+
+- story: Business Capitol Intent with Entity
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: business_capitol
+    entities:
+      - current_business_name: entity_value
+  - action: utter_business_capitol
+
+- story: Business Partner Intent
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: business_partner
+  - action: utter_business_partner
+
+- story: Market Demand Profile Intent
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: market_demand_profile
+  - action: utter_market_demand_profile
+
+- story: Supply Chain Intent
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: market_demand_profile
+  - action: utter_market_demand_profile
+
+- story: Legal Requirements Intent
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: market_demand_profile
+  - action: utter_market_demand_profile
+
+
+
