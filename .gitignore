@@ -8,7 +8,6 @@ resources
 **/.DS_Store
 **/scratch/*
 data*/*
-arc_gis/output.zip
 *.xlsx*
 *.zip*
 arc_gis/config.ini

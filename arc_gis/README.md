@@ -1,5 +1,7 @@
 # ARC_GIS / ESRI Geo-Enrichment
 
+`config.ini` should be maintained with configurations in arcgis folder.
+
 ### Code Execution Details
 `enrich_subgepgraphies.ipynb` is the python notebook used to create geo-enrichment files for :  
 1. `San Diego County`  
