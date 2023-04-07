@@ -28,8 +28,11 @@ def main():
     path_dict = {"node":    out_p / "nodes.csv",
                  "rel":     out_p / "rels.csv",
                  "err":     out_p / "error_log.csv",
-                #  "pattern": out_p / "rest_detail_pattern.csv"
-                 "pattern": out_p / "pattern.csv"}
+                 "pattern_csv": out_p / "rest_detail_pattern.csv",
+                 "pattern_json": out_p / "pattern_index.json",
+                 "annot": out_p / "annot.csv",
+                #  "pattern": out_p / "pattern.csv"
+                 }
 
     # create csvs for neo4j
     create_csvs(path_dict)
