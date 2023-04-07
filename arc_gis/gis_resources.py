@@ -10,5 +10,10 @@ def san_diego_county_zips():
     return [int(i) for i in read_list]
 
 def get_lat_long(address):
-    loc = geocode(address)[0]['location']
-    return loc['x'],loc['y']
+    try:
+        loc = geocode(address)[0]['location']
+        ret_val = loc['x'],loc['y']
+    except IndexError:
+        print(f"Problem with address: {address}")
+        ret_val = 0.0,0.0
+    return ret_val
