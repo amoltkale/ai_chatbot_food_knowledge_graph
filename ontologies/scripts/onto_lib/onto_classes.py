@@ -31,6 +31,7 @@ def parse_logic(unknown_node, known_node, *, edge, edge_direction, restr_key, re
                 node_type = "Concept"
 
             # Create node and add as child of known node
+            # new_node = EntityNode(unknown_node, node_type, known_node)
             new_node = EntityNode(unknown_node, node_type)
             known_node.add_child(new_node,
                                 rel_type=edge, direction=edge_direction,
@@ -40,6 +41,7 @@ def parse_logic(unknown_node, known_node, *, edge, edge_direction, restr_key, re
         case owlready2.prop.ObjectPropertyClass():
             node_type = "Property"
             # Create node and add as child of known node
+            # new_node = EntityNode(unknown_node, node_type, known_node)
             new_node = EntityNode(unknown_node, node_type)
             known_node.add_child(new_node,
                                 rel_type=edge, direction=edge_direction,
@@ -48,6 +50,7 @@ def parse_logic(unknown_node, known_node, *, edge, edge_direction, restr_key, re
 
         case owlready2.class_construct.And():
             # Add node
+            # trans_node = TransitionNode(f"AND_{str(unknown_node)}", "AND", known_node)
             trans_node = TransitionNode(f"AND_{str(unknown_node)}", "AND")
             # link to known
             known_node.add_child(trans_node,
@@ -66,6 +69,7 @@ def parse_logic(unknown_node, known_node, *, edge, edge_direction, restr_key, re
 
         case owlready2.class_construct.Or():
             # OR node
+            # trans_node = TransitionNode(f"OR_{str(unknown_node)}", "OR", known_node)
             trans_node = TransitionNode(f"OR_{str(unknown_node)}", "OR")
             # link to known
             known_node.add_child(trans_node,
@@ -84,6 +88,7 @@ def parse_logic(unknown_node, known_node, *, edge, edge_direction, restr_key, re
 
         case owlready2.class_construct.Restriction():
             # BLANK node
+            # trans_node = TransitionNode(f"BLANK_{str(unknown_node)}", "BLANK", known_node)
             trans_node = TransitionNode(f"BLANK_{str(unknown_node)}", "BLANK")
             # link to known
             known_node.add_child(trans_node,
@@ -126,6 +131,7 @@ def parse_logic(unknown_node, known_node, *, edge, edge_direction, restr_key, re
 
         case owlready2.class_construct.Not():
             # NOT node
+            # trans_node = TransitionNode(f"NOT_{str(unknown_node)}", "NOT", known_node)
             trans_node = TransitionNode(f"NOT_{str(unknown_node)}", "NOT")
 
             # link to known
@@ -142,6 +148,7 @@ def parse_logic(unknown_node, known_node, *, edge, edge_direction, restr_key, re
 
         case owlready2.class_construct.OneOf():
             # OneOf node
+            # trans_node = TransitionNode(f"ONEOF_{str(unknown_node)}", "ONEOF", known_node)
             trans_node = TransitionNode(f"ONEOF_{str(unknown_node)}", "ONEOF")
 
             # link to known
@@ -185,6 +192,7 @@ def parse_logic(unknown_node, known_node, *, edge, edge_direction, restr_key, re
                 node_type = "Nothing"
             else:
                 node_type = "Thing"
+            # new_node = EntityNode(unknown_node, node_type, known_node)
             new_node = EntityNode(unknown_node, node_type)
             known_node.add_child(new_node,
                                 rel_type=edge, direction=edge_direction,
@@ -215,6 +223,7 @@ def create_graph(onto):
             node_type = "Concept"
 
         # Add node and create graph
+        # root_node = EntityNode(entity, node_type, None)
         root_node = EntityNode(entity, node_type)
         g = Graph(root_node, entity_set, transition_set)
 
@@ -244,20 +253,24 @@ class Graph:
         self.root = root
         self.entity_set = entity_set
         self.transition_set = transition_set
+        self.pattern = None
 
     def export_graph(self):
         raise NotImplementedError
 
-
-
-
-
 class EntityNode:
+    '''
+    TODO: Generalize entire class to Node then inherient both EntityNode and TransitionNode types
+    Make use of same methods for both classes
+    '''
     # def __init__(self, entity, neo_type, parent=None):
     def __init__(self, entity, neo_type):
         self.entity = entity
         self.id = str(entity)
-        self.label = ';'.join(entity.label)
+        try:
+            self.label = ';'.join(entity.label)
+        except:
+            self.label = ""
         self.iri = entity.iri
         self.neo_type = neo_type
         self.children = []
@@ -266,9 +279,16 @@ class EntityNode:
     def add_child(self, node_obj, *, direction, rel_type, restr_key, restr_value):
         if direction != "source" and direction != "target":
             raise ValueError(f"direction can only be source or target, recieved {direction}")
+        try:
+            # Quick and dirty way
+            # Can check type to do this better
+            rel_label = ';'.join(rel_type.label)
+        except:
+            rel_label = ''
         self.children.append({"node"     : node_obj,
                               "direction": direction,
                               "rel_type" : rel_type,
+                              "rel_label": rel_label,
                               "restriction": restr_key,
                               "restriction_value": restr_value
                               })
@@ -277,7 +297,7 @@ class EntityNode:
         raise NotImplementedError
 
 class TransitionNode:
-    # def __init__(self, neo_type, parent):
+    # def __init__(self, id, neo_type, parent=None):
     def __init__(self, id, neo_type):
         self.id = id
         self.label = None
@@ -289,9 +309,16 @@ class TransitionNode:
     def add_child(self, node_obj, *, direction, rel_type, restr_key, restr_value):
         if direction != "source" and direction != "target":
             raise ValueError(f"direction can only be source or target, recieved {direction}")
+        try:
+            # Quick and dirty way
+            # Can check type to do this better
+            rel_label = ';'.join(rel_type.label)
+        except:
+            rel_label = ''
         self.children.append({"node"     : node_obj,
                               "direction": direction,
                               "rel_type" : rel_type,
+                              "rel_label": rel_label,
                               "restriction": restr_key,
                               "restriction_value": restr_value
                               })
