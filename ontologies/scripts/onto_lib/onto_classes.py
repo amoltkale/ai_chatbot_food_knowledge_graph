@@ -1,3 +1,5 @@
+import csv
+
 from owlready2 import *
 '''
 Solution to making patterns:
@@ -13,6 +15,58 @@ Updating Neo4j:
     Look for new nodes
     Find all places where new node appears and update any transitions if desired
 '''
+def export_traverse(*, node_p, rel_p, node, node_set=set(), edge_set=set()):
+    match node:
+        case Graph():
+            # initialize recursion
+            # node_children = node.root.children
+            node = node.root
+            node_set = append_node_row(node_p, node, node_set)
+        case EntityNode():
+             # node_children = node.children
+            pass
+        case TransitionNode():
+            # node_children = node.children
+            # if transitionNode has no children -> return and do not write empty node
+            if len(node.children) == 0:
+                return
+            
+    for n in node.children:
+        node_set = append_node_row(node_p, n["node"], node_set)
+        append_edge_row(rel_p, node, n, edge_set)
+        export_traverse(node_p=node_p, rel_p=rel_p,node=n['node'], node_set=node_set)
+
+def append_node_row(node_p, n, node_set):
+    # node_id:ID,label:string[],iri,:LABEL
+    # return [n.id, n.label, n.iri, n.neo_type]
+    if n.id not in node_set:
+        row = [n.id, n.label, n.iri, n.neo_type]
+        node_set.add(n.id)
+
+        with open(node_p, 'a') as f:
+            w = csv.writer(f, delimiter=',')
+            w.writerow(row)
+
+    return node_set
+
+def append_edge_row(rel_p, parent_n, child_n, edge_set):
+    # :START_ID,:END_ID,:TYPE,restriction,restriction_value,label
+    if (parent_n.id, child_n["node"].id) not in edge_set:
+        edge_set.add((parent_n.id, child_n["node"].id))
+        if child_n["direction"] == "target":
+            row = [parent_n.id, child_n["node"].id, child_n["rel_type"], 
+                    child_n['restriction'], child_n['restriction_value'],
+                    child_n['rel_label'],
+                ]
+        else:
+            row = [child_n["node"].id, parent_n.id, child_n["rel_type"], 
+                    child_n['restriction'], child_n['restriction_value'],
+                    child_n['rel_label'],
+                ]
+            
+        with open(rel_p, 'a') as f:
+            w = csv.writer(f, delimiter=',')
+            w.writerow(row)
 
 def extract_restriction(res):
     return res.property,res.type,res.value
@@ -211,7 +265,7 @@ def parse_logic(unknown_node, known_node, *, edge, edge_direction, restr_key, re
     return
 
 
-def create_graph(onto):
+def create_graph(onto, path_dict):
     entity_set = set()
     transition_set = set()
     for entity in onto.classes():
@@ -241,11 +295,27 @@ def create_graph(onto):
                             edge="is_a", edge_direction="target",
                             restr_key=None, restr_value=None
                             )
-
         else:
             print(f"{root_node.id} does not have equivalent_to or is_a properties.")
 
-        # root_node.set_children()
+        export_traverse(node_p=path_dict["node"], rel_p=path_dict["rel"],node=g,
+                        node_set=entity_set, edge_set=transition_set)
+
+    for entity in onto.object_properties():
+        root_node = EntityNode(entity, "Property")
+        g = Graph(root_node, entity_set, transition_set)
+
+        # check if equivalence is not empty
+        if list(entity.subclasses()):
+            for child in entity.subclasses():
+                parse_logic(child, root_node,
+                            edge="subproperty_of", edge_direction="target",
+                            restr_key=None, restr_value=None
+                            )
+
+        export_traverse(node_p=path_dict["node"], rel_p=path_dict["rel"],node=g,
+                        node_set=entity_set, edge_set=transition_set)
+
     return g
 
 class Graph:
@@ -279,6 +349,9 @@ class EntityNode:
     def add_child(self, node_obj, *, direction, rel_type, restr_key, restr_value):
         if direction != "source" and direction != "target":
             raise ValueError(f"direction can only be source or target, recieved {direction}")
+        if node_obj.neo_type == "AND" or node_obj.neo_type == "OR":
+            # swap directions
+            direction="target"
         try:
             # Quick and dirty way
             # Can check type to do this better
