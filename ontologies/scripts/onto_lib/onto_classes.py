@@ -15,6 +15,59 @@ Updating Neo4j:
     Look for new nodes
     Find all places where new node appears and update any transitions if desired
 '''
+def initialize_annots(onto):
+    annot_set = set()
+    for c in onto.classes():
+        annot_set = annot_set | get_annots(c)
+
+    annot_dict = {a: None for a in annot_set}
+    return annot_dict
+
+def get_annots(c):
+    annot_set = set()
+    for class_prop in c.get_class_properties():
+        match class_prop:
+            case owlready2.annotation.AnnotationPropertyClass():
+                '''
+                The examples why extracting the annotations need to be in a try block:
+                ValueError: Cannot read literal of datatype 570!: obo.IAO_0000117, obo.IAO_0000119
+                ValueError: Cannot read literal of datatype 571!: rdf-schema.label
+                ValueError: Cannot read literal of datatype 576! 1.1.date
+                ValueError: Cannot read literal of datatype 6103!: oboInOwl.hasDbXref
+                '''
+
+                try:
+                    p_str = ""
+                    for p_item in class_prop.__getitem__(c):
+                        if p_item is None:
+                            continue
+                        if len(p_str) > 0:
+                            p_str = p_str + "###" + str(p_item)
+                        else:
+                            p_str = str(p_item)
+                    if p_str == "None":
+                        continue
+                    # check name of annotation
+                    if class_prop.label.first() is None:
+                        annot_str = str(class_prop)
+                    else:
+                        annot_str = class_prop.label.first()
+
+                    p_str.replace("'", "")
+                    p_str.replace('"', "")
+                    p_str = " ".join(p_str.splitlines())
+                    annot_str = annot_str.replace("(", "")
+                    annot_str = annot_str.replace(")", "")
+                    annot_set.add(annot_str)
+                except:
+                    pass
+
+            case owlready2.prop.ObjectPropertyClass() | owlready2.prop.DataPropertyClass():
+                pass
+            case _:
+                raise TypeError(f"Unknown type: {type(class_prop)}")
+    return annot_set
+
 def export_traverse(*, node_p, rel_p, node, node_set=set(), edge_set=set()):
     match node:
         case Graph():
@@ -40,7 +93,9 @@ def append_node_row(node_p, n, node_set):
     # node_id:ID,label:string[],iri,:LABEL
     # return [n.id, n.label, n.iri, n.neo_type]
     if n.id not in node_set:
+        annot_list = [n.annot_dict[k] for k in sorted(n.annot_dict.keys())]
         row = [n.id, n.label, n.iri, n.neo_type]
+        row = row + annot_list
         node_set.add(n.id)
 
         with open(node_p, 'a') as f:
@@ -71,7 +126,7 @@ def append_edge_row(rel_p, parent_n, child_n, edge_set):
 def extract_restriction(res):
     return res.property,res.type,res.value
 
-def parse_logic(unknown_node, known_node, *, edge, edge_direction, restr_key, restr_value):
+def parse_logic(unknown_node, known_node, *, edge, edge_direction, restr_key, restr_value, annot_dict):
     # TODO add flag to invalidate tree
     match unknown_node:
         case owlready2.entity.ThingClass():
@@ -86,7 +141,8 @@ def parse_logic(unknown_node, known_node, *, edge, edge_direction, restr_key, re
 
             # Create node and add as child of known node
             # new_node = EntityNode(unknown_node, node_type, known_node)
-            new_node = EntityNode(unknown_node, node_type)
+            new_node = EntityNode(unknown_node, node_type, annot_dict.copy())
+            new_node.get_class_annots()
             known_node.add_child(new_node,
                                 rel_type=edge, direction=edge_direction,
                                 restr_key=restr_key, restr_value=restr_value
@@ -96,7 +152,8 @@ def parse_logic(unknown_node, known_node, *, edge, edge_direction, restr_key, re
             node_type = "Property"
             # Create node and add as child of known node
             # new_node = EntityNode(unknown_node, node_type, known_node)
-            new_node = EntityNode(unknown_node, node_type)
+            new_node = EntityNode(unknown_node, node_type, annot_dict.copy())
+            new_node.get_class_annots()
             known_node.add_child(new_node,
                                 rel_type=edge, direction=edge_direction,
                                 restr_key=restr_key, restr_value=restr_value
@@ -105,7 +162,7 @@ def parse_logic(unknown_node, known_node, *, edge, edge_direction, restr_key, re
         case owlready2.class_construct.And():
             # Add node
             # trans_node = TransitionNode(f"AND_{str(unknown_node)}", "AND", known_node)
-            trans_node = TransitionNode(f"AND_{str(unknown_node)}", "AND")
+            trans_node = TransitionNode(f"AND_{str(unknown_node)}", "AND", annot_dict.copy())
             # link to known
             known_node.add_child(trans_node,
                     rel_type=edge, direction=edge_direction,
@@ -118,13 +175,14 @@ def parse_logic(unknown_node, known_node, *, edge, edge_direction, restr_key, re
                 # connected_node will be added as child in call
                 parse_logic(connected_node, trans_node,
                             edge="member_of", edge_direction="source",
-                            restr_key=None, restr_value=None
+                            restr_key=None, restr_value=None,
+                            annot_dict=annot_dict.copy()
                             )
 
         case owlready2.class_construct.Or():
             # OR node
             # trans_node = TransitionNode(f"OR_{str(unknown_node)}", "OR", known_node)
-            trans_node = TransitionNode(f"OR_{str(unknown_node)}", "OR")
+            trans_node = TransitionNode(f"OR_{str(unknown_node)}", "OR", annot_dict.copy())
             # link to known
             known_node.add_child(trans_node,
                     rel_type=edge, direction=edge_direction,
@@ -137,13 +195,14 @@ def parse_logic(unknown_node, known_node, *, edge, edge_direction, restr_key, re
                 # connected_node will be added as child in call
                 parse_logic(connected_node, trans_node,
                             edge="member_of", edge_direction="source",
-                            restr_key=None, restr_value=None
+                            restr_key=None, restr_value=None,
+                            annot_dict=annot_dict.copy()
                             )
 
         case owlready2.class_construct.Restriction():
             # BLANK node
             # trans_node = TransitionNode(f"BLANK_{str(unknown_node)}", "BLANK", known_node)
-            trans_node = TransitionNode(f"BLANK_{str(unknown_node)}", "BLANK")
+            trans_node = TransitionNode(f"BLANK_{str(unknown_node)}", "BLANK", annot_dict.copy())
             # link to known
             known_node.add_child(trans_node,
                     rel_type=edge, direction=edge_direction,
@@ -180,13 +239,14 @@ def parse_logic(unknown_node, known_node, *, edge, edge_direction, restr_key, re
 
             parse_logic(new_unknown_type, trans_node,
                         edge=edge_label, edge_direction="target",
-                        restr_key=r_key, restr_value=r_val
+                        restr_key=r_key, restr_value=r_val,
+                        annot_dict=annot_dict.copy()
                         )
 
         case owlready2.class_construct.Not():
             # NOT node
             # trans_node = TransitionNode(f"NOT_{str(unknown_node)}", "NOT", known_node)
-            trans_node = TransitionNode(f"NOT_{str(unknown_node)}", "NOT")
+            trans_node = TransitionNode(f"NOT_{str(unknown_node)}", "NOT", annot_dict.copy())
 
             # link to known
             known_node.add_child(trans_node,
@@ -197,13 +257,14 @@ def parse_logic(unknown_node, known_node, *, edge, edge_direction, restr_key, re
             # Get NOT children
             parse_logic(unknown_node.Class, trans_node,
                         edge="member_of", edge_direction="source",
-                        restr_key=None, restr_value=None
+                        restr_key=None, restr_value=None,
+                        annot_dict=annot_dict.copy()
                         )
 
         case owlready2.class_construct.OneOf():
             # OneOf node
             # trans_node = TransitionNode(f"ONEOF_{str(unknown_node)}", "ONEOF", known_node)
-            trans_node = TransitionNode(f"ONEOF_{str(unknown_node)}", "ONEOF")
+            trans_node = TransitionNode(f"ONEOF_{str(unknown_node)}", "ONEOF", annot_dict.copy())
 
             # link to known
             known_node.add_child(trans_node,
@@ -220,7 +281,8 @@ def parse_logic(unknown_node, known_node, *, edge, edge_direction, restr_key, re
                 # make recursion call on connected node
                 parse_logic(types.new_class(connected_node.name, (Thing,)), trans_node,
                             edge="member_of", edge_direction="source",
-                            restr_key=None, restr_value=None
+                            restr_key=None, restr_value=None,
+                            annot_dict=annot_dict.copy()
                             )
 
         case type() | bool() | None:
@@ -247,7 +309,8 @@ def parse_logic(unknown_node, known_node, *, edge, edge_direction, restr_key, re
             else:
                 node_type = "Thing"
             # new_node = EntityNode(unknown_node, node_type, known_node)
-            new_node = EntityNode(unknown_node, node_type)
+            new_node = EntityNode(unknown_node, node_type, annot_dict.copy())
+            new_node.get_class_annots()
             known_node.add_child(new_node,
                                 rel_type=edge, direction=edge_direction,
                                 restr_key=restr_key, restr_value=restr_value
@@ -266,6 +329,7 @@ def parse_logic(unknown_node, known_node, *, edge, edge_direction, restr_key, re
 
 
 def create_graph(onto, path_dict):
+    annot_dict = initialize_annots(onto)
     entity_set = set()
     transition_set = set()
     for entity in onto.classes():
@@ -278,7 +342,8 @@ def create_graph(onto, path_dict):
 
         # Add node and create graph
         # root_node = EntityNode(entity, node_type, None)
-        root_node = EntityNode(entity, node_type)
+        root_node = EntityNode(entity, node_type, annot_dict.copy())
+        root_node.get_class_annots()
         g = Graph(root_node, entity_set, transition_set)
 
         # Add children to root node
@@ -286,14 +351,16 @@ def create_graph(onto, path_dict):
             for child in entity.equivalent_to:
                 parse_logic(child, root_node,
                             edge="equivalent_to", edge_direction="target",
-                            restr_key=None, restr_value=None
+                            restr_key=None, restr_value=None,
+                            annot_dict=annot_dict.copy()
                             )
 
         elif list(entity.is_a):
             for child in entity.is_a:
                 parse_logic(child, root_node,
                             edge="is_a", edge_direction="target",
-                            restr_key=None, restr_value=None
+                            restr_key=None, restr_value=None,
+                            annot_dict=annot_dict.copy()
                             )
         else:
             print(f"{root_node.id} does not have equivalent_to or is_a properties.")
@@ -302,7 +369,8 @@ def create_graph(onto, path_dict):
                         node_set=entity_set, edge_set=transition_set)
 
     for entity in onto.object_properties():
-        root_node = EntityNode(entity, "Property")
+        root_node = EntityNode(entity, "Property", annot_dict.copy())
+        root_node.get_class_annots()
         g = Graph(root_node, entity_set, transition_set)
 
         # check if equivalence is not empty
@@ -310,7 +378,8 @@ def create_graph(onto, path_dict):
             for child in entity.subclasses():
                 parse_logic(child, root_node,
                             edge="subproperty_of", edge_direction="target",
-                            restr_key=None, restr_value=None
+                            restr_key=None, restr_value=None,
+                            annot_dict=annot_dict.copy()
                             )
 
         export_traverse(node_p=path_dict["node"], rel_p=path_dict["rel"],node=g,
@@ -334,7 +403,7 @@ class EntityNode:
     Make use of same methods for both classes
     '''
     # def __init__(self, entity, neo_type, parent=None):
-    def __init__(self, entity, neo_type):
+    def __init__(self, entity, neo_type, annot_dict):
         self.entity = entity
         self.id = str(entity)
         try:
@@ -344,6 +413,7 @@ class EntityNode:
         self.iri = entity.iri
         self.neo_type = neo_type
         self.children = []
+        self.annot_dict = annot_dict
         # self.parent = parent
 
     def add_child(self, node_obj, *, direction, rel_type, restr_key, restr_value):
@@ -366,17 +436,65 @@ class EntityNode:
                               "restriction_value": restr_value
                               })
 
-    def set_children(self):
-        raise NotImplementedError
+    def get_class_annots(self):
+        # rdf-schema.Datatype
+        c = self.entity
+        if isinstance(c, owlready2.entity.ThingClass):
+            for class_prop in c.get_class_properties():
+                match class_prop:
+                    case owlready2.annotation.AnnotationPropertyClass():
+                        '''
+                        The examples why extracting the annotations need to be in a try block:
+                        ValueError: Cannot read literal of datatype 570!: obo.IAO_0000117, obo.IAO_0000119
+                        ValueError: Cannot read literal of datatype 571!: rdf-schema.label
+                        ValueError: Cannot read literal of datatype 576! 1.1.date
+                        ValueError: Cannot read literal of datatype 6103!: oboInOwl.hasDbXref
+                        '''
+
+                        try:
+                            p_str = ""
+                            for p_item in class_prop.__getitem__(c):
+                                if p_item is None:
+                                    continue
+                                if len(p_str) > 0:
+                                    p_str = p_str + "###" + str(p_item)
+                                else:
+                                    p_str = str(p_item)
+                            if p_str == "None":
+                                continue
+                            # check name of annotation
+                            if class_prop.label.first() is None:
+                                annot_str = str(class_prop)
+                            else:
+                                annot_str = class_prop.label.first()
+                            annot_str = annot_str.replace("(", "")
+                            annot_str = annot_str.replace(")", "")
+
+                            p_str.replace("'", "")
+                            p_str.replace('"', "")
+                            p_str = " ".join(p_str.splitlines())
+
+                            self.annot_dict[annot_str] = p_str
+                        except:
+                            pass
+
+                    case owlready2.prop.ObjectPropertyClass() | owlready2.prop.DataPropertyClass():
+                        pass
+                    case _:
+                        raise TypeError(f"Unknown type: {type(class_prop)}")
+
+        def set_children(self):
+            raise NotImplementedError
 
 class TransitionNode:
     # def __init__(self, id, neo_type, parent=None):
-    def __init__(self, id, neo_type):
+    def __init__(self, id, neo_type, annot_dict):
         self.id = id
         self.label = None
         self.iri = None
         self.neo_type = neo_type
         self.children = []
+        self.annot_dict = annot_dict
         # self.parent = parent
 
     def add_child(self, node_obj, *, direction, rel_type, restr_key, restr_value):
