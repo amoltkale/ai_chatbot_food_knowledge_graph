@@ -7,13 +7,15 @@ from owlready2 import *
 
 import pandas as pd
 
-def create_csvs(path_dict: dict):
+def create_csvs(path_dict: dict, *, annot_list=None):
     # TODO change path_dict to include file type
     for k in path_dict.keys():
         match k:
             case "node":
                 with open(path_dict[k], 'w') as csvfile:
                     fieldnames = ['node_id:ID', 'label:string[]', 'iri', ':LABEL']
+                    if not annot_list is None:
+                        fieldnames = fieldnames + sorted(annot_list)
                     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
                     writer.writeheader()
             case "rel":
