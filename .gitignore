@@ -10,4 +10,4 @@ resources
 data*/*
 *.xlsx*
 *.zip*
-arc_gis/config.ini
+**/*.ini
