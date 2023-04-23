@@ -15,4 +15,4 @@ pandas==1.4.4
 scikit-learn==1.2.1
 seaborn==0.12.2
 SQLAlchemy==1.4.46
-
+spacy==3.5.2
