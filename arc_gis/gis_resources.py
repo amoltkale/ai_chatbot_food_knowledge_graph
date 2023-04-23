@@ -7,7 +7,7 @@ def san_diego_county_zips():
     
     with open(os.path.dirname(__file__)+"/resources/san_diego_county_zips", "rb") as fp:   # Unpickling
         read_list = pickle.load(fp)
-    return [int(i) for i in read_list]
+    return [i for i in read_list]
 
 def get_lat_long(address):
     try:
