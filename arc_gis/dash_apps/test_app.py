@@ -1,6 +1,6 @@
 ## COMMENTED OUT
-# from flask import Flask
-# import flask
+from flask import Flask
+import flask
 import webbrowser
 
 # import plotly.io as pio # used to read in cached file
@@ -16,23 +16,24 @@ import os
 STATIC_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
 
 ## READ IN HTML AS STRING INSTEAD OF STARTING FLASK APP AND ROUTING HTML FILE
-HtmlFile = open(fname, 'r', encoding='utf-8')
-source_code = HtmlFile.read()
+# fname = "./static/test_html.html"
+# HtmlFile = open(fname, 'r', encoding='utf-8')
+# source_code = HtmlFile.read()
 
 ## COMMENT OUT FLASK APP
-# server = Flask(__name__)
+server = Flask(__name__)
 app = dash.Dash(name = __name__, server = server)
 
 app.layout = html.Div([
     html.Div(id='target',
-        children=html.Embed(src=source_code, height="500px", width="1000px"))
+        children=html.Embed(src='./static/test_html.html', height="500px", width="1000px"))
 ])
 
 ## COMMENTED OUT FLASK SERVER
-# @app.server.route('/static/<resource>')
-# def serve_static(resource):
-#     # print(resource)
-#     return flask.send_from_directory(STATIC_PATH, resource)
+@app.server.route('/static/<resource>')
+def serve_static(resource):
+    # print(resource)
+    return flask.send_from_directory(STATIC_PATH, resource)
 
 #############################
 ###         APP           ###
