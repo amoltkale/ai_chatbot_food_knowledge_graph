@@ -32,6 +32,8 @@ app.layout = html.Div([
     html.H4('Please answer all questions as accurately as possible. If you are unsure, please ask the bot to try again.',
             style={'text-align': 'center'}),
     html.Div([
+        html.Div(id='conversation'),
+        html.Br(),
         html.Div([
             html.Table([
                 html.Tr([
@@ -44,8 +46,7 @@ app.layout = html.Div([
                 ])
             ])],
             style={'width': '325px', 'margin': '0 auto'}),
-        html.Br(),
-        html.Div(id='conversation')],
+        ],
         id='screen',
         style={'width': '400px', 'margin': '0 auto'})
 ])
@@ -63,8 +64,8 @@ def update_conversation(click, text):
 
     if click is None:
         # call bot with user inputted text
-        # response = "Hello World! Please be sure you are ready to use tokens. Then uncomment the code below!"
-        response = get_bot_response(llm, text)
+        response = "Hello World! Please be sure you are ready to use tokens. Then uncomment the code below!"
+        # response = get_bot_response(llm, text)
 
         # user message aligned left
         rcvd = [html.H5(text, style={'text-align': 'left'})]
@@ -72,20 +73,21 @@ def update_conversation(click, text):
         rspd = [html.H5(html.I(response), style={'text-align': 'right'})]
         # append interaction to conversation history
         # conv_hist = rcvd + rspd + [html.Hr()] + conv_hist
-        conv_hist = rspd + [html.Hr()] + conv_hist
+        # conv_hist = rspd + [html.Hr()] + conv_hist
+        conv_hist = conv_hist + rspd + [html.Hr()]
 
         return "", conv_hist
     if click > 0:
         # call bot with user inputted text
-        # response = "Bye Bye"
-        response = get_bot_response(llm, text)
+        response = "Bye Bye"
+        # response = get_bot_response(llm, text)
 
         # user message aligned left
         rcvd = [html.H5(text, style={'text-align': 'left'})]
         # bot response aligned right and italics
         rspd = [html.H5(html.I(response), style={'text-align': 'right'})]
         # append interaction to conversation history
-        conv_hist = rcvd + rspd + [html.Hr()] + conv_hist
+        conv_hist = conv_hist + rcvd + rspd + [html.Hr()]
         return "", conv_hist
     else:
         return "", ""
