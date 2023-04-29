@@ -26,11 +26,11 @@ def location_biz_type_retriever(
     parameters:
         location: location as text, e.g. 'Chula Vista, San Diego'
         food_biz_type: Food business in the question, e.g. 'Mexican Grocery Store'
-        specific_variables: list of specific/required variable names, e.g ["radius", "10 miles"]
+        specific_variables: list of specific/required variable names, e.g ["radius", "2 miles"]
 
     returns:
         Intent of the question along with locationa and business type as a JSON. E.g.
-        {"location": "Chula Vista, San Diego", "radius": "within 10 mile radius"}
+        {"location": "Chula Vista, San Diego", "radius": "within 2 mile radius"}
 
     '''
     data = {}
@@ -38,7 +38,6 @@ def location_biz_type_retriever(
     # this function is a mockup, returns fake/hardcoded weather forecast data
     #data['utterance'] = 'location recommendation'
     data['radius'] = 'within 10 mile radius'
-    data['utterance'] = 'Thank you for filling up the form, we understand that you want to open a Mexican Grocery Store in Chula Vista within 10 mile radius.'
 
     # ERROR/EXCEPTION: DISAMBIGUATION REQUIRED
     # the tool can't elaborate because it doesn't has the mandatory variable 'location',
@@ -61,7 +60,7 @@ def location_biz_type_retriever(
 
 def location_recommendation(json_request: str) -> str:
     '''
-    wraps the weather_data_retriever function,
+    wraps the location_biz_type_retriever function,
     converting the input JSON in separated arguments.
 
     Args:
@@ -74,7 +73,7 @@ def location_recommendation(json_request: str) -> str:
             { "location":"Chula Vista", "food_biz_type":"Mexican Grocery Store", "specific_variables":["humidity"]}
 
     Returns:
-        The utterance with location and food business type.
+        The location and food business type.
     '''
     arguments = json.loads(json_request)
 
@@ -93,7 +92,7 @@ def location_recommendation(json_request: str) -> str:
 # to avoid a runt-time error triggered by the agent instatiation.
 #
 name = 'location_recommendation'
-request_format = '{{"utterance","utterance","location":"location","food_biz_type":"food_biz_type","specific_variables":["variable_name"]}}'
+request_format = '{{"location":"location","food_biz_type":"food_biz_type","specific_variables":["variable_name"]}}'
 description = f'''
 Helps to identify the intent of the question.
 Input should be JSON in the following format: {request_format}
