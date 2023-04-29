@@ -89,7 +89,7 @@ def update_conversation(click, text):
         return "", conv_hist
     if click > 0:
         # call bot with user inputted text
-        file_name = get_block_group_map(text, 2.0)
+        print_statements_file_name = get_block_group_map(text, 2.0)
 
         #response = "Bye Bye"
 
@@ -97,16 +97,17 @@ def update_conversation(click, text):
         # user message aligned left
         rcvd = [html.H5(text, style={'text-align': 'left'})]
         
-        rspd =  [html.Iframe(src=file_name, height="300px", width="500px")]
+        rspd =  [html.Iframe(src=print_statements_file_name[1], height="300px", width="500px")]
         # response = get_bot_response(llm, text)
 
 
         # bot response aligned right and italics
         # All return functions from langchain should be in a list so that it can be appended
         # rspd = [html.H5(html.I(response), style={'text-align': 'right'})]
+        additional_text = [html.H5(html.I(print_statements_file_name[0]), style={'text-align': 'right'})]
 
         # append interaction to conversation history
-        conv_hist = conv_hist + rcvd + rspd + [html.Hr()]
+        conv_hist = conv_hist + additional_text + rcvd + rspd + [html.Hr()]
         # conv_hist = conv_hist + rcvd + [html.Embed(src='./static/test_html.html')] + [html.Hr()]
 
         return "", conv_hist
