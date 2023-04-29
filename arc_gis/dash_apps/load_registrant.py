@@ -8,23 +8,33 @@ import pandas as pd
 sys.path.append('../../')
 from utils import get_config
 
-def get_welcome_prompt(*, id=32):
-    user_df = load_user(id=id)
+def get_welcome_prompt(*, id=32, email="m.hernandez@gmail.com"):
+    conn = server_connect()
+    # user_df = load_user(conn, id=id)
 
-    # clean user_df
-    user_meta = convert_df(user_df)
+    # # clean user_df
+    # user_meta = convert_df(user_df)
 
-    # TODO READ PROMPT FROM FILE
-    # Initial prompt
-    prompt = f"Here is some information about a person. There information is given in json format below." \
-            "Please welcome this person as if you are talking to them, and summarize their business needs, location, and funding needs. " \
-            "At the end you should ask the user if the information is correct. " \
-            "Please do not repeat their personal information back to them since they already know this and you are talking to them." \
-            f"{user_meta}"
+    # # TODO READ PROMPT FROM FILE
+    # # Initial prompt
+    # prompt = f"Here is some information about a person. There information is given in json format below." \
+    #         "Please welcome this person as if you are talking to them, and summarize their business needs, location, and funding needs. " \
+    #         "At the end you should ask the user if the information is correct. " \
+    #         "Please do not repeat their personal information back to them since they already know this and you are talking to them." \
+    #         f"{user_meta}"
+
+    profile = get_user_business_profile(conn, email=email)
+    prompt = f"""
+                State the speaker's business and intended use of the funding in one sentence. 
+                Phrase the response as if you are addressing the author. 
+                Do not add any preamble like "based on your text". 
+                Make the response a little personal but not very long".
+                End by asking "How can I help you"?
+                Here is the business profile in json format: {profile}
+             """
     return prompt
 
-def load_user(*,id):
-    conn = server_connect()
+def load_user(conn, *,id):
     user_df = get_user_df(conn, id=id)
     return user_df
 
@@ -89,3 +99,38 @@ def convert_df(df):
     res_df.dropna(inplace=True, axis=1)
     res_df.drop(columns=["id", "insert_dts"], inplace=True)
     return {c.replace("biz", "business"): res_df[c][0] for c in res_df.columns}
+
+def get_user_business_profile(conn, *, email):
+    qry = f"""
+            select 'My home address is ' || home_street_address || ' '|| home_city || ' '  || home_state || '. ' ||
+            case
+            when  current_business_description is not null then current_business_description
+            else ''
+            end ||
+            prospective_business_description || ' ' || planned_fund_use as business_profile
+            from registrants
+            where email @> '{{{email}}}'
+            """
+
+    obs = run_qry(conn, qry)
+
+    assert len(obs) == 1
+
+    return {"business_profile": obs[0][0]}
+
+def run_qry(conn, query_str):
+    # Get registrant of interest
+    # create a cursor
+    cur = conn.cursor()
+
+    # execute a statement
+    cur.execute(query_str)
+
+
+    # display the PostgreSQL database server version
+    obs = cur.fetchall()
+
+    # Close the communication with the PostgreSQL
+    cur.close()
+
+    return obs

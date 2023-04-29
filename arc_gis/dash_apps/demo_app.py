@@ -9,6 +9,7 @@ from langchain.llms import OpenAI
 
 # get welcome prompt
 prompt = get_welcome_prompt()
+print(prompt)
 
 # Prepare openai
 ai_key = get_config("open_ai","key")
@@ -62,8 +63,8 @@ def update_conversation(click, text):
 
     if click is None:
         # call bot with user inputted text
-        response = "Hello World! Please be sure you are ready to use tokens. Then uncomment the code below!"
-        # response = get_bot_response(llm, text)
+        # response = "Hello World! Please be sure you are ready to use tokens. Then uncomment the code below!"
+        response = get_bot_response(llm, text)
 
         # user message aligned left
         rcvd = [html.H5(text, style={'text-align': 'left'})]
@@ -76,8 +77,8 @@ def update_conversation(click, text):
         return "", conv_hist
     if click > 0:
         # call bot with user inputted text
-        response = "Bye Bye"
-        # response = get_bot_response(llm, text)
+        # response = "Bye Bye"
+        response = get_bot_response(llm, text)
 
         # user message aligned left
         rcvd = [html.H5(text, style={'text-align': 'left'})]
