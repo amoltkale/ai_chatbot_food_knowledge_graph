@@ -23,3 +23,5 @@ dash==2.9.3
 plotly==5.14.1
 Flask==2.3.1
 llama-index==0.5.23
+langchain==0.0.152
+openai==0.27.5

@@ -1,26 +1,38 @@
+from flask import Flask
+import flask
+import webbrowser
+
 from load_registrant import *
-from app_utils import get_bot_response # Rename to bot_utils
+from app_utils import get_bot_prediction # Rename to bot_utils
 
 import dash
 from dash.dependencies import Input, Output, State
 from dash import dcc, html
 
-from langchain.llms import OpenAI
+from langchain import OpenAI, ConversationChain
+# from langchain.llms import OpenAI, ConversationChain
+
+import os
+
+# https://community.plotly.com/t/how-can-i-use-my-html-file-in-dash/7740/2
+STATIC_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
 
 # get welcome prompt
-prompt = get_welcome_prompt()
-print(prompt)
+prompt = get_welcome_prompt() # for now defaults to email: m.hernandez@gmail.com
 
 # Prepare openai
 ai_key = get_config("open_ai","key")
-llm = OpenAI(temperature=0, verbose=True, openai_api_key=ai_key)
+llm = OpenAI(temperature=0, verbose=True, openai_api_key=ai_key) # temp=0 for most reproducible results
+# Add memory with Conversation Chain
+conversation = ConversationChain(llm=llm, verbose=True)
 
 # init app and add stylesheet
-app = dash.Dash()
+# Flask app 
+server = Flask(__name__)
+app = dash.Dash(name = __name__, server = server)
 app.css.append_css({"external_url": "https://codepen.io/chriddyp/pen/bWLwgP.css"})
 
 # init a list of the sessions conversation history
-# conv_hist = ["ABCDE"]
 conv_hist = []
 
 
@@ -63,35 +75,46 @@ def update_conversation(click, text):
     global conv_hist
 
     if click is None:
-        # call bot with user inputted text
+        # Initial load: Get prompt and welcome user
         response = "Hello World! Please be sure you are ready to use tokens. Then uncomment the code below!"
-        # response = get_bot_response(llm, text)
+        # response = get_bot_prediction(conversation, text)
 
         # user message aligned left
         rcvd = [html.H5(text, style={'text-align': 'left'})]
         # bot response aligned right and italics
         rspd = [html.H5(html.I(response), style={'text-align': 'right'})]
-        # append interaction to conversation history
-        # conv_hist = rcvd + rspd + [html.Hr()] + conv_hist
-        # conv_hist = rspd + [html.Hr()] + conv_hist
-        conv_hist = conv_hist + rspd + [html.Hr()]
 
+        # append interaction to conversation history and return
+        # conv_hist = conv_hist + rspd + [html.Hr()]
+        conv_hist = rspd + [html.Hr()]
         return "", conv_hist
     if click > 0:
         # call bot with user inputted text
         response = "Bye Bye"
-        # response = get_bot_response(llm, text)
+        # response = get_bot_prediction(conversation, text)
 
         # user message aligned left
         rcvd = [html.H5(text, style={'text-align': 'left'})]
         # bot response aligned right and italics
+        # All return functions from langchain should be in a list so that it can be appended
         rspd = [html.H5(html.I(response), style={'text-align': 'right'})]
+
         # append interaction to conversation history
         conv_hist = conv_hist + rcvd + rspd + [html.Hr()]
+        # conv_hist = conv_hist + rcvd + [html.Embed(src='./static/test_html.html')] + [html.Hr()]
+
         return "", conv_hist
     else:
         return "", ""
 
+# Embed html
+@app.server.route('/static/<resource>')
+def serve_static(resource):
+    return flask.send_from_directory(STATIC_PATH, resource)
+
+
 # run app
 if __name__ == '__main__':
-    app.run_server()
+    webbrowser.open('http://127.0.0.1:8050/', new=0, autoraise=True) 
+    app.run_server(debug=True, use_reloader=False)
+    # app.run_server()
