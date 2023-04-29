@@ -19,6 +19,7 @@ app = dash.Dash()
 app.css.append_css({"external_url": "https://codepen.io/chriddyp/pen/bWLwgP.css"})
 
 # init a list of the sessions conversation history
+# conv_hist = ["ABCDE"]
 conv_hist = []
 
 
@@ -50,34 +51,43 @@ app.layout = html.Div([
 
 # trigger bot response to user inputted message on submit button click
 @app.callback(
+    Output("msg_input", "value"),
     Output("conversation", "children"),
     Input("send_button", "n_clicks"),
-    Input('msg_input', 'value'),
+    State('msg_input', 'value'),
 )
 # function to add new user*bot interaction to conversation history
 def update_conversation(click, text):
     global conv_hist
 
-    # call bot with user inputted text
-    response = "Hello World"
-    # response = get_bot_response(text)
+    if click is None:
+        # call bot with user inputted text
+        response = "Hello World! Please be sure you are ready to use tokens. Then uncomment the code below!"
+        # response = get_bot_response(llm, text)
 
-    # user message aligned left
-    rcvd = [html.H5(text, style={'text-align': 'left'})]
-    # bot response aligned right and italics
-    rspd = [html.H5(html.I(response), style={'text-align': 'right'})]
-    # append interaction to conversation history
-    conv_hist = rcvd + rspd + [html.Hr()] + conv_hist
+        # user message aligned left
+        rcvd = [html.H5(text, style={'text-align': 'left'})]
+        # bot response aligned right and italics
+        rspd = [html.H5(html.I(response), style={'text-align': 'right'})]
+        # append interaction to conversation history
+        # conv_hist = rcvd + rspd + [html.Hr()] + conv_hist
+        conv_hist = rspd + [html.Hr()] + conv_hist
 
-    return conv_hist
+        return "", conv_hist
+    if click > 0:
+        # call bot with user inputted text
+        response = "Bye Bye"
+        # response = get_bot_response(llm, text)
 
-@app.callback(
-    Output(component_id='msg_input', component_property='value'),
-    [Input(component_id='conversation', component_property='children')]
-)
-def clear_input(_):
-    return ''
-
+        # user message aligned left
+        rcvd = [html.H5(text, style={'text-align': 'left'})]
+        # bot response aligned right and italics
+        rspd = [html.H5(html.I(response), style={'text-align': 'right'})]
+        # append interaction to conversation history
+        conv_hist = rcvd + rspd + [html.Hr()] + conv_hist
+        return "", conv_hist
+    else:
+        return "", ""
 
 # run app
 if __name__ == '__main__':
