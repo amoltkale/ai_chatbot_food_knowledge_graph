@@ -55,11 +55,11 @@ def get_block_group_map(region, radius):
     lat_long = [region_address[0]['location']['y'],region_address[0]['location']['x']]
     address_score = region_address[0]['score']
     address_identified = region_address[0]['address']
-    print(f"Important Fields: \n Address Matched: {address_identified} \n Latitude,Longitude: {lat_long}\n Match SCore: {address_score}")
+    # print(f"Important Fields: \n Address Matched: {address_identified} \n Latitude,Longitude: {lat_long}\n Match SCore: {address_score}")
 
 
     point_location = region_address[0]['location']
-    print(f"point_location: {point_location}")
+    # print(f"point_location: {point_location}")
     point_geom = Point({"x": point_location['x'], "y": point_location['y'], "spatialReference" : {'wkid': 4326, 'latestWkid': 4326}})
 
     ## This buffer query was failing because ESRI takes constant values instead of names for unit.
@@ -68,7 +68,7 @@ def get_block_group_map(region, radius):
     buffer_geom = buffer(geometries=[point_geom], distances=radius, unit='9035', in_sr={'wkid': 4326, 'latestWkid': 4326})
 
     target_geometry = buffer_geom[0]
-    target_geometry
+    # target_geometry
 
 
     buffer_filter = intersects(target_geometry,{'wkid': 4326, 'latestWkid': 4326})
@@ -77,8 +77,8 @@ def get_block_group_map(region, radius):
                             return_geometry=True,
                             geometry_filter=buffer_filter,
                             as_df=True)
-    print(f"Number of block groups identified: {result_rows.shape[0]}")
-    result_rows.head(3)
+    #print(f"Number of block groups identified: {result_rows.shape[0]}")
+    #result_rows.head(3)
 
     ## Getting the map center
     map_centre = [point_location['y'],point_location['x']]
@@ -95,7 +95,7 @@ def get_block_group_map(region, radius):
 
     embed_minimal_html('static/block_level_map.html', views=[m3])
 
-    return 'static/block_level_map.html'
+    return (f"Number of block groups identified: {result_rows.shape[0]}",'static/block_level_map.html')
 
 
 if __name__ == '__main__':
