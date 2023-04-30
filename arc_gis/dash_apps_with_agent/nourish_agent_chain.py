@@ -8,6 +8,7 @@ from langchain.agents import ZeroShotAgent, Tool, AgentExecutor
 from location_recommendation_tool import LocationRecommendation
 from load_registrant_tool import LoadRegistrant
 from load_registrant import get_welcome_prompt
+from funding_recommendation_tool import FundingRecommendation
 
 # import to read configs
 import sys
@@ -42,7 +43,8 @@ summry_chain = LLMChain(
 
 tools = [
          LoadRegistrant,
-         LocationRecommendation
+         LocationRecommendation,
+         FundingRecommendation,
          ]
 
 prefix = """Have a conversation with a human, answering the following questions as best you can. You have access to the following tools:"""

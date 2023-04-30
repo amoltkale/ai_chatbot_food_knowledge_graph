@@ -130,6 +130,19 @@ def get_user_business_profile(conn, *, email):
 
     return {"business_profile": obs[0][0]}
 
+def get_user_funding_needs(conn, *, email):
+    qry = f"""
+            select 'My funding needs are ' || planned_fund_use
+            from registrants
+            where email @> '{{{email}}}'
+            """
+
+    obs = run_qry(conn, qry)
+
+    assert len(obs) == 1
+
+    return {"planned_funding_use": obs[0][0]}
+
 def run_qry(conn, query_str):
     # Get registrant of interest
     # create a cursor
