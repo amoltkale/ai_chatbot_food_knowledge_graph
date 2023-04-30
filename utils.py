@@ -6,7 +6,7 @@ def get_config(section_name,config_name):
     parse = configparser.ConfigParser()
     parse.read(os.path.dirname(__file__)+"/config.ini")
     config_details = parse.get(section_name, config_name)
-    print(str(parse))
+    # print(str(parse))
     return config_details
     
 def format_json(rings_json):    

@@ -5,6 +5,10 @@ from arcgis.geocoding import geocode
 from arcgis.geometry import buffer, Point
 from arcgis.geometry.filters import intersects
 
+from langchain import OpenAI
+
+from app_utils import get_bot_response
+
 import pandas as pd
 
 import sys
@@ -16,9 +20,14 @@ from ipywidgets.embed import embed_minimal_html
 
 def get_block_group_map(region, radius):
 
+  
+
     username = get_config("arcgis","username")
     password = get_config("arcgis","passkey")
     gis = GIS("https://ucsdonline.maps.arcgis.com/home", username=username, password=password)
+
+    #openaikey = get_config("open_ai","key")
+    #llm = OpenAI(temperature=0, openai_api_key=openaikey)
 
     # Query the block group for respective variables and feature layer.
     #variables = "demographics"
@@ -93,10 +102,32 @@ def get_block_group_map(region, radius):
                             map_widget= m3,)
     m3.draw(target_geometry)
 
+    # template = """
+    #         We are using hot cmap coloring argument given to function pandas df.spatial.plot(). Explain in human understandable 
+    #         verbal description about the color representation in context of the col variable passed to it.
+    #         Also elaborate and explain below parameters from our query result in a human friendly fasion: 
+    #         Radius: {radius}, Number of block groups identified: {result_rows.shape[0]}
+    # """
+
+    tempt_dict = {"Radius": radius, "Total Block Groups": result_rows.shape[0]}
+    # template = """
+    #         Remember that you are directly talking to the person and should address them as if you are talking to them.
+    #         Explain in a friendly manner the color map where dark red reprsents low opprotunity for their business and
+    #         bright yellow resprsents high opprotunity for their business.
+    #         Also format the following json text in a friendly and human digestable fashion.
+    #         {temp_dict}
+    # """
+    template = f"""
+            Darker colors represents low opportunity for your business, while brighter colors represents high opportunity.
+            This is taking a total radius of {radius} miles and identified {result_rows.shape[0]} total blocks.
+            """
+
+
+
     embed_minimal_html('static/block_level_map.html', views=[m3])
-    return {'file_path':'static/block_level_map.html','verbal_desc':f"Number of block groups identified: {result_rows.shape[0]}"}
+    return {'file_path':'static/block_level_map.html','verbal_desc':template}
     #return (f"Number of block groups identified: {result_rows.shape[0]}",'static/block_level_map.html')
 
 
 if __name__ == '__main__':
-    get_block_group_map('Bonita, San Diego',5.0)
+    print(get_block_group_map('Bonita, San Diego',2.0)["verbal_desc"])
