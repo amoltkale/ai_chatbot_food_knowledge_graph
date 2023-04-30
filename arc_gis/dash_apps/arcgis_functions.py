@@ -94,8 +94,8 @@ def get_block_group_map(region, radius):
     m3.draw(target_geometry)
 
     embed_minimal_html('static/block_level_map.html', views=[m3])
-
-    return (f"Number of block groups identified: {result_rows.shape[0]}",'static/block_level_map.html')
+    return {'file_path':'static/block_level_map.html','verbal_desc':f"Number of block groups identified: {result_rows.shape[0]}"}
+    #return (f"Number of block groups identified: {result_rows.shape[0]}",'static/block_level_map.html')
 
 
 if __name__ == '__main__':

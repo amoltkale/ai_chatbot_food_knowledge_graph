@@ -28,8 +28,7 @@ llm = OpenAI(temperature=0, openai_api_key=openaikey)
 
 
 template = '''\
-Utter the question in the form \'Thank you for filling up the form, we understand that \
-you want to open a Mexican Grocery Store in Chula Vista within 10 mile radius.\' \
+Please respond to the questions accurately and succinctly. \
 If you are unable to obtain the necessary data after seeking help, \
 indicate that you do not know.
 '''
