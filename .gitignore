@@ -11,3 +11,4 @@ data*/*
 *.xlsx*
 *.zip*
 **/*.ini
+*.html*

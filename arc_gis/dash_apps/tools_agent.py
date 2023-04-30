@@ -14,9 +14,14 @@ from langchain.agents import initialize_agent
 from langchain.llms import OpenAI
 from langchain import LLMChain
 from langchain.prompts import PromptTemplate
+# Memory
+from langchain.memory import ConversationBufferMemory
+
 
 # import custom tools
 from location_recommendation_tool import LocationRecommendation
+
+
 
 # import to read configs
 import sys
@@ -28,21 +33,26 @@ llm = OpenAI(temperature=0, openai_api_key=openaikey)
 
 
 template = '''\
+You are a chatbot having coversation with a human.
+{chat_history}
+Human: {human_input}
 Please respond to the questions accurately and succinctly. \
 If you are unable to obtain the necessary data after seeking help, \
 indicate that you do not know.
 '''
 
-prompt = PromptTemplate(input_variables=[], template=template)
+prompt = PromptTemplate(input_variables=["chat_history","human_input"], template=template)
 
+memory = ConversationBufferMemory(memory_key="chat_history")
 # debug
 # print(prompt.format())
 
 # Load the tool configs that are needed.
-llm_weather_chain = LLMChain(
+llm_location_chain = LLMChain(
     llm=llm,
     prompt=prompt,
-    verbose=True
+    verbose=True,
+    memory=memory
 )
 
 tools = [

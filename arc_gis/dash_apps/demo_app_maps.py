@@ -3,13 +3,13 @@ import flask
 import webbrowser
 
 from load_registrant import *
-from app_utils import get_bot_response # Rename to bot_utils
+from app_utils import get_bot_response, get_bot_prediction # Rename to bot_utils
 
 import dash
 from dash.dependencies import Input, Output, State
 from dash import dcc, html
 
-from langchain.llms import OpenAI
+from langchain import OpenAI, ConversationChain
 
 from tools_agent import agent
 
@@ -26,6 +26,8 @@ prompt = get_welcome_prompt() # for now defaults to email: m.hernandez@gmail.com
 # Prepare openai
 ai_key = get_config("open_ai","key")
 llm = OpenAI(temperature=0, verbose=True, openai_api_key=ai_key) # temp=0 for most reproducible results
+
+conversation = ConversationChain(llm=llm, verbose=True)
 
 # init app and add stylesheet
 # Flask app 
@@ -79,6 +81,7 @@ def update_conversation(click, text):
         # Initial load: Get prompt and welcome user
         response = "Hello World! Please be sure you are ready to use tokens. Then uncomment the code below!"
         # response = get_bot_response(llm, text)
+        #response = get_bot_prediction(conversation, text)
 
         # user message aligned left
         rcvd = [html.H5(text, style={'text-align': 'left'})]
