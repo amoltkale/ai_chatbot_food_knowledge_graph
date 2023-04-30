@@ -1,0 +1,96 @@
+body{
+    margin:0;
+
+}
+
+.leaflet-container{
+    height:100vh;
+    width:100vw;
+}
+
+:root {
+    --brand-color: darkolivegreen;
+  }
+  
+  body {
+    margin: 1;
+    background-color: AntiqueWhite;
+  /*   background: url("https://assets.codepen.io/373707/pexels-engin-akyurt-3368291.jpg");
+    background-blend-mode: multiply; */
+  }
+  
+  * {
+    font-family: 'Ubuntu Mono', monospace;
+  }
+  
+  .container {
+    min-height: 100vh;
+    max-height: 100vh;
+    height: 100vh;
+    overflow-y: hidden;
+    display: flex;
+    gap: 2rem;
+    flex-direction: row;
+    max-width: 90rem;
+    margin: 0 auto;
+    padding: 5rem 0;
+    box-sizing: border-box;
+  }
+  
+  .column {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .main-section {
+    min-width: 0;
+    flex-basis: 0;
+    flex-grow: 1;
+  }
+  
+  .main-section > div{
+    margin-bottom: 1rem;
+  }
+  .small-blurb {
+    font-size: 2rem;
+    /* line-height: 9.5rem; */
+    text-transform: uppercase;
+    color: var(--brand-color);
+    margin: auto;
+    width: 30%;
+    padding: 1px;
+
+  }
+  
+  
+  .big-blurb {
+    font-size: 5rem;
+    /* line-height: 9.5rem; */
+    text-transform: uppercase;
+    color: var(--brand-color);
+  }
+  
+   .btn {
+    background-color: var(--brand-color);
+    padding: 1rem;
+    border-radius: 2rem;
+    color: white;
+    box-sizing: border-box;
+    display: inline-block;
+    text-decoration: none;
+  }
+  
+  .right-section {
+    background: url("https://assets.codepen.io/373707/pexels-wendy-wei-1656663.jpg");
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+  
+  @media (max-width: 1300px) {
+    .right-section {
+      display: none;
+    }
+    .left-section {
+      text-align: center;
+    }
+  }
