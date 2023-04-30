@@ -22,21 +22,31 @@ def get_welcome_prompt(*, id=32, email="m.hernandez@gmail.com"):
     #         "At the end you should ask the user if the information is correct. " \
     #         "Please do not repeat their personal information back to them since they already know this and you are talking to them." \
     #         f"{user_meta}"
-
-    profile = get_user_business_profile(conn, email=email)
+    user_df, user_profile = load_user(conn, email=email)
+    biz_profile = get_user_business_profile(conn, email=email)
+    # prompt = f"""
+    #             State the speaker's business and intended use of the funding in one sentence. 
+    #             Phrase the response as if you are addressing the author. 
+    #             Do not add any preamble like "based on your text". 
+    #             Make the response a little personal but not very long".
+    #             End by asking "How can I help you"?
+    #             Here is the business profile in json format: {profile}
+    #          """
     prompt = f"""
                 State the speaker's business and intended use of the funding in one sentence. 
-                Phrase the response as if you are addressing the author. 
-                Do not add any preamble like "based on your text". 
-                Make the response a little personal but not very long".
+                You are directly talking to the author so do not add any preamble like "based on your text". 
+                Please treat the person as if you are directly talking with them.
+                Make your response professional, friendly, and concise.
                 End by asking "How can I help you"?
-                Here is the business profile in json format: {profile}
+                Here is general information on the person you are talking to: {user_profile}
+                Here is the business profile in json format: {biz_profile}
              """
+    print(prompt)
     return prompt
 
-def load_user(conn, *,id):
-    user_df = get_user_df(conn, id=id)
-    return user_df
+def load_user(conn, *,email):
+    user_df = get_user_df(conn, email=email)
+    return user_df, convert_df(user_df)
 
 def server_connect():
     # load
@@ -49,7 +59,7 @@ def server_connect():
         password=nourish_pswd)
     return conn
 
-def get_user_df(conn, *, id):
+def get_user_df(conn, *, email):
     # Get resgistrant attributes
     # TODO generalize getting table attributes
     col_qry = """
@@ -74,9 +84,10 @@ def get_user_df(conn, *, id):
     # create a cursor
     cur = conn.cursor()
 
-    query_str = f"select * "\
-                f"from registrants " \
-                f"where id = {id}"
+    query_str = f"""select * 
+                from registrants 
+                where email @> '{{{email}}}'
+                """
 
     # execute a statement
     cur.execute(query_str)
@@ -98,7 +109,7 @@ def convert_df(df):
     res_df = df.copy()
     res_df.dropna(inplace=True, axis=1)
     res_df.drop(columns=["id", "insert_dts"], inplace=True)
-    return {c.replace("biz", "business"): res_df[c][0] for c in res_df.columns}
+    return {c: res_df[c][0] for c in res_df.columns if "biz" not in c}
 
 def get_user_business_profile(conn, *, email):
     qry = f"""
