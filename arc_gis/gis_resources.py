@@ -1,3 +1,5 @@
+import warnings
+
 from pathlib import Path
 
 import csv
@@ -34,6 +36,9 @@ def read_exact_unhealthy_food_biz_categories():
     return res
 
 def create_where_clause(in_list):
+    '''
+    This is only applicable for ca_business table from postgresSQL nourish db
+    '''
     qry_where_list = []
     for c in in_list:
 
@@ -79,3 +84,18 @@ def execute_sql(conn, qry):
     cur.close()
     
     return res
+
+def create_feature_layer(gis, sdf, title, tags, folder='nourish_gis'):
+    items = gis.content.search(query="title:'{}' AND type:'Feature Service'".format(title))
+    if len(items) > 0 and items[0].owner=='akale_UCSD':
+        warnings.warn("Feature Layer already exists with title {}".format(title), category=UserWarning)
+        lyr = items[0].layers[0]
+        return lyr
+    else:
+        # Convert back from a SEDF into a feature layer, and publishing on AGOL
+        my_new_featurelayer = sdf.spatial.to_featurelayer(title=title, 
+                                                                 gis=gis, 
+                                                                 folder='nourish_gis',
+                                                                 tags=tags)
+        lyr = my_new_featurelayer.layers[0]
+        return lyr
