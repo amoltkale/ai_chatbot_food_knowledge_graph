@@ -6,7 +6,8 @@ import json
 from typing import List
 from langchain.agents import Tool
 
-from arcgis_functions import get_block_group_map
+from arcgis_functions import get_block_group_map, get_block_group_map_with_opp_comp_score
+
 
 
 def location_map_retreiver(
@@ -36,7 +37,7 @@ def location_map_retreiver(
     '''
     data = {}
 
-    verbal_desc_map = get_block_group_map(location, radius)  
+    verbal_desc_map = get_block_group_map_with_opp_comp_score(location, radius)  
 
     # this function is a mockup, returns fake/hardcoded weather forecast data
     #data['utterance'] = 'location recommendation'
@@ -102,14 +103,13 @@ def location_recommendation(json_request: str) -> str:
 name = 'location_recommendation'
 request_format = '{{"location":"location","radius":"radius","specific_variables":["variable_name"]}}'
 output_format = '{{"file_path":"file_path","verbal_desc":"verbal_desc","location":"location","radius":"radius"}}'
-print("----")
-print(request_format)
-print("----")
+
 ## We were getting the below error:
 ## json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 2 (char 1)
 description = f'''
 Helps to identify the intent of the question.
-Input must be valid JSON in the following format with double quotes. DO NOT USE SINGLE QUOTES. : {request_format}
+Input must be valid JSON in the following format with double quotes. DO NOT USE SINGLE QUOTES.
+USE DOUBLE QUOTES. : {request_format}
 In the input format, do not add units for radius. Just keep a float value such as 2.0.
 Supply "specific_variables" list just if you really need them.
 If don't know the value to be assigned to a key, omit the key.

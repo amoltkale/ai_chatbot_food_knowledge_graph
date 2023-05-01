@@ -41,7 +41,7 @@ def get_welcome_prompt(*, id=32, email="m.hernandez@gmail.com"):
                 Here is general information on the person you are talking to: {{{user_profile}}}
                 Here is the business profile in json format: {{{biz_profile}}}
              """
-    print(prompt)
+    #print(prompt)
     return prompt
 
 def load_user(conn, *,email):
@@ -117,7 +117,7 @@ def get_user_business_profile(conn, *, email):
             select 'My home address is ' || home_street_address || ' '|| home_city || ' '  || home_state || '. ' ||
             case
             when  current_business_description is not null then current_business_description
-            else ''
+            else 'I do not own a current business. I want to start a new business'
             end ||
             prospective_business_description || ' ' || planned_fund_use as business_profile
             from registrants

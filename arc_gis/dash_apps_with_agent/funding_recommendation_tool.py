@@ -27,6 +27,7 @@ def get_funding_prompt(*, email="m.hernandez@gmail.com"):
 
     template = f"""
                 REMEMBER YOU ARE TALKING DIRECTLY TO THE USER.
+                Do not make any assumptions. You should only refer to the information.
                 Here is a json describing loans. The highest level key is the loan name.
                 For each loan in the json format, tell the user if they are eligible
                 for any of the loans based on the business_eligibility key under each loan key.
