@@ -180,12 +180,12 @@ def get_block_group_map_with_opp_comp_score(region, radius):
     result_rows.spatial.plot(renderer_type='c',                          
                             map_widget= map,)
     # Drawing a radius boundary for ease of demo.
-    map.draw(target_geometry)
+    # map.draw(target_geometry)
 
 
     template = f"""
             Darker colors represents high opportunity for your business, while brighter colors represents low opportunity.
-            This is taking a total radius of {radius} miles and identified {result_rows.shape[0]} total blocks.
+            This is taking a total radius of {radius} miles and identified {result_rows.shape[0]} total block groups.
             """
 
 
