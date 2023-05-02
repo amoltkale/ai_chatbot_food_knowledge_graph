@@ -50,7 +50,7 @@ app = dash.Dash(name = __name__, server = server)
 app.css.append_css({"external_url": "https://codepen.io/chriddyp/pen/bWLwgP.css"})
 
 # init a list of the sessions conversation history
-conv_hist = [html.H5(html.I(intial_response), style={'text-align': 'right'})] + [html.Hr()]
+conv_hist = [html.H5(html.I(intial_response), style={'text-align': 'left'})] + [html.Hr()]
 
 
 
@@ -59,7 +59,7 @@ conv_hist = [html.H5(html.I(intial_response), style={'text-align': 'right'})] + 
 
 # app ui
 app.layout = html.Div([
-    html.H3('Fresh Start Bot Demo', style={'text-align': 'center'}),
+    html.H3('Fresh Start Chatbot', style={'text-align': 'center'}),
     html.H4('Please answer all questions as accurately as possible. If you are unsure, please ask the bot to try again.',
             style={'text-align': 'center'}),
     html.Div([
@@ -79,11 +79,11 @@ app.layout = html.Div([
                                     style={'valign': 'middle'})
                         ])
                     ])],
-            style={'width': '325px', 'margin': '0 auto'})
+                    style={'width': '325px', 'margin': '0 auto'})
                     ),
         ],
         id='screen',
-        style={'width': '400px', 'margin': '0 auto'})
+        style={'width': '1000px', 'margin': '0 auto'})
 ])
 
 # trigger bot response to user inputted message on submit button click
@@ -102,7 +102,7 @@ def update_conversation(click, text):
     if click > 0:
         # call bot with user inputted text
 
-        # rspd = ["Bye Bye"]
+        # rspd = [html.H5(html.I("Bye Bye"), style={'text-align': 'left'})]
         with get_openai_callback() as cb:
             agent_response = agent_chain.run(text)
             print(f"Total Tokens: {cb.total_tokens}")
@@ -112,16 +112,16 @@ def update_conversation(click, text):
         try:
             output_json = json.loads(agent_response)
             if 'file_path' in output_json:
-                additional_text = [html.H5(html.I(output_json['verbal_desc']), style={'text-align': 'right'})]
+                additional_text = [html.H5(html.I(output_json['verbal_desc']), style={'text-align': 'left'})]
                 rspd =  [html.Iframe(src=output_json['file_path'], height="300px", width="500px")] + additional_text
             else:
-                rspd = [html.H5(html.I(output_json['response']), style={'text-align': 'right'})]
+                rspd = [html.H5(html.I(output_json['response']), style={'text-align': 'left'})]
         except:
-            rspd = [html.H5(html.I(agent_response), style={'text-align': 'right'})]
+            rspd = [html.H5(html.I(agent_response), style={'text-align': 'left'})]
 
 
         # user message aligned left
-        rcvd = [html.H5(text, style={'text-align': 'left'})]
+        rcvd = [html.H5(html.B(text), style={'text-align': 'right', })]
         
 
         # append interaction to conversation history
