@@ -240,7 +240,7 @@ def nearest_facility(originating_address, facilities_feat_lyr, gis, as_df=False,
     df1['originating_address'] = [originating_address_feature.attributes['Match_addr'] for i in range(count_of_facilities)]
     df1['contact_number'] = contact_numbers
 
-    df1 = df1[['facility_address','originating_address','contact_number','Total_Miles','Total_TravelTime']]
+    df1 = df1[['facility_address','originating_address','contact_number','Total_Miles']]
 
     if return_all_facilities:
         if as_df:
