@@ -34,6 +34,7 @@ def get_welcome_prompt(*, id=32, email="m.hernandez@gmail.com"):
     #          """
     prompt = f"""
                 State the speaker's business and intended use of the funding in one sentence. 
+                There is no need to understand their business profile and funding needs right now.
                 You are directly talking to the author so do not add any preamble like "based on your text". 
                 Please treat the person as if you are directly talking with them.
                 Make your response professional, friendly, and concise.
