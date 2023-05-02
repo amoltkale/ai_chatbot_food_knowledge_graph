@@ -59,7 +59,7 @@ def location_map_retreiver(
 
     # warning: the variable radius is not defined so a default value is assigned
     if not radius or radius == 'radius':
-        data['radius'] = '2.0'
+        data['radius'] = '5.0'
 
     # if required variable names are not included in the data section,
     # the attribute is added to the dictionary with value I don't know.
@@ -106,7 +106,7 @@ output_format = '{{"file_path":"file_path","verbal_desc":"verbal_desc","location
 description = f'''
 Helps to identify the intent of the question.
 Input must be valid JSON in the following format with double quotes: {request_format}
-In the input format, do not add units for radius. Just keep a float value such as 2.0.
+In the input format, do not add units for radius. Just keep a float value such as 5.0.
 Supply "specific_variables" list just if you really need them.
 If don't know the value to be assigned to a key, omit the key.
 Output must be valid JSON in the following format: {output_format}. 

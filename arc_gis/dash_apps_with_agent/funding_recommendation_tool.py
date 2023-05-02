@@ -37,6 +37,7 @@ def get_funding_prompt(*, email="m.hernandez@gmail.com"):
                 If the Application is eligible for any loan, tell them the loan name.
                 If they do not qualify for any loands, state the reason.
                 Phrase the response as if you are addressing the applicant.
+                This could also give eligibility criteria, description or eloboration or information or tell more about the loans.
                 """
     #print(template)
     return template
@@ -55,7 +56,7 @@ def format_funding(request: str = None) -> str:
 
 
 name = "funding_recommendation_tool"
-request_format = '{{"planned_fund_use":"planned_fund_use"", "specific_variables":["variable_name"]"}}'
+request_format = '{{"eligibility":"eligibility","planned_fund_use":"planned_fund_use", "specific_variables":["variable_name"]"}}'
 
 response_format = '{{"response":"response"}}'
 description = f'''

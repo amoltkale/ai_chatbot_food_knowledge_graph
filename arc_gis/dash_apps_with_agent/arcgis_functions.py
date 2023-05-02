@@ -179,7 +179,7 @@ def get_block_group_map_with_opp_comp_score(region, radius, gis):
     template = f"""
     We have generated a map for you around {region}, which shows areas with high business opportunities in darker colors and 
     areas with low opportunities in brighter colors. We use six factors to calculate the score, such as how many people live there, 
-    how much they spend on eating out, and how many restaurants are already there.
+    how much they spend on food away from home, and how many restaurants are already there.
     This map has been created considering a radius of {radius} miles, and we have 
     identified a total of  {result_rows.shape[0]} block groups in the area.
     A block group here is a small geographic unit which contains between 600 and 3,000 people.
