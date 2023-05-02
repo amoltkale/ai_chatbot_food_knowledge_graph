@@ -27,6 +27,7 @@ def get_funding_prompt(*, email="m.hernandez@gmail.com"):
 
     template = f"""
                 REMEMBER YOU ARE TALKING DIRECTLY TO THE USER.
+                Do not answer question about loan locations.
                 Do not make any assumptions. You should only refer to the information.
                 Here is a json describing loans. The highest level key is the loan name.
                 For each loan in the json format, tell the user if they are eligible
@@ -37,6 +38,7 @@ def get_funding_prompt(*, email="m.hernandez@gmail.com"):
                 If the Application is eligible for any loan, tell them the loan name.
                 If they do not qualify for any loands, state the reason.
                 Phrase the response as if you are addressing the applicant.
+                Answer question to talk more about loan eligibility.
                 """
     #print(template)
     return template
@@ -55,7 +57,7 @@ def format_funding(request: str = None) -> str:
 
 
 name = "funding_recommendation_tool"
-request_format = '{{"planned_fund_use":"planned_fund_use"", "specific_variables":["variable_name"]"}}'
+request_format = '{{"planned_fund_use":"planned_fund_use","eligibility":"eligibility","specific_variables":["variable_name"]"}}'
 
 response_format = '{{"response":"response"}}'
 description = f'''

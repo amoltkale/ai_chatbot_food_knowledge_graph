@@ -113,7 +113,7 @@ def update_conversation(click, text):
             output_json = json.loads(agent_response)
             if 'file_path' in output_json:
                 additional_text = [html.H5(html.I(output_json['verbal_desc']), style={'text-align': 'left'})]
-                rspd =  [html.Iframe(src=output_json['file_path'], height="300px", width="500px")] + additional_text
+                rspd =  [html.Iframe(src=output_json['file_path'], height="400px", width="1000px")] + additional_text
             else:
                 rspd = [html.H5(html.I(output_json['response']), style={'text-align': 'left'})]
         except:
@@ -140,6 +140,6 @@ def serve_static(resource):
 
 # run app
 if __name__ == '__main__':
-    webbrowser.open('http://127.0.0.1:8050/', new=0, autoraise=True) 
+    #webbrowser.open('http://127.0.0.1:8050/', new=0, autoraise=True) 
     app.run_server(debug=True, use_reloader=False)
     # app.run_server()
