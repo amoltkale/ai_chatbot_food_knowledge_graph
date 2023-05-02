@@ -171,10 +171,19 @@ def get_block_group_map_with_opp_comp_score(region, radius, gis):
     # map.draw(target_geometry)
 
 
+    # template = f"""
+    #         Darker colors represents high opportunity for your business, while brighter colors represents low opportunity.
+    #         This is taking a total radius of {radius} miles and identified {result_rows.shape[0]} total block groups.
+    #         """
+
     template = f"""
-            Darker colors represents high opportunity for your business, while brighter colors represents low opportunity.
-            This is taking a total radius of {radius} miles and identified {result_rows.shape[0]} total block groups.
-            """
+    We have generated a map for you around {region}, which shows areas with high business opportunities in darker colors and 
+    areas with low opportunities in brighter colors. We use six factors to calculate the score, such as how many people live there, 
+    how much they spend on eating out, and how many restaurants are already there.
+    This map has been created considering a radius of {radius} miles, and we have 
+    identified a total of  {result_rows.shape[0]} block groups in the area.
+    A block group here is a small geographic unit which contains between 600 and 3,000 people.
+    """
 
 
 
@@ -193,6 +202,7 @@ def nearest_facility(originating_address, facilities_feat_lyr, gis, as_df=False,
     facility_feat_list = []
     matched_facility_address = []
     contact_numbers = []
+    org_names_list = []
 
     if facilities_feat_lyr is not None:
         fset = facilities_feat_lyr.query()
@@ -204,6 +214,7 @@ def nearest_facility(originating_address, facilities_feat_lyr, gis, as_df=False,
             facility_feat = Feature(geometry=all_geometries_sr4326[i],attributes=all_attributes[i])
             matched_facility_address.append(facility_feat.attributes['Match_addr'])
             contact_numbers.append(facility_feat.attributes['cont_nmbr'])
+            org_names_list.append(facility_feat.attributes['org_name'])
 
             facility_feat_list.append(facility_feat)
 
@@ -239,8 +250,9 @@ def nearest_facility(originating_address, facilities_feat_lyr, gis, as_df=False,
     df1['facility_address'] = matched_facility_address
     df1['originating_address'] = [originating_address_feature.attributes['Match_addr'] for i in range(count_of_facilities)]
     df1['contact_number'] = contact_numbers
+    df1['organization_name'] = org_names_list
 
-    df1 = df1[['facility_address','originating_address','contact_number','Total_Miles']]
+    df1 = df1[['facility_address','originating_address','contact_number','organization_name','Total_Miles']]
 
     if return_all_facilities:
         if as_df:
