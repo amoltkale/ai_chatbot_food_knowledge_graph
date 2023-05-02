@@ -11,7 +11,7 @@ def get_funding_prompt(*, email="m.hernandez@gmail.com"):
     conn = server_connect()
     qry = """
     SELECT funding_program,
-            use_of_funds || business_eligibility AS eligibility
+            use_of_funds || business_eligibility || application_requirements AS eligibility
     FROM funding_src
     """
 
