@@ -12,6 +12,7 @@ from dash import dcc, html
 from langchain import OpenAI, ConversationChain, LLMChain, PromptTemplate
 from langchain.memory import ConversationBufferMemory, ReadOnlySharedMemory
 from langchain.agents import ZeroShotAgent, Tool, AgentExecutor
+from langchain.callbacks import get_openai_callback
 
 # from tools_agent import agent
 from location_recommendation_tool import LocationRecommendation
@@ -29,7 +30,12 @@ STATIC_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
 ai_key = get_config("open_ai","key")
 llm = OpenAI(temperature=0, verbose=True, openai_api_key=ai_key) # temp=0 for most reproducible results
 
-intial_response = agent_chain.run(get_welcome_prompt())
+with get_openai_callback() as cb:
+    intial_response = agent_chain.run(get_welcome_prompt())
+    print(f"Total Tokens: {cb.total_tokens}")
+    print(f"Prompt Tokens: {cb.prompt_tokens}")
+    print(f"Completion Tokens: {cb.completion_tokens}")
+    print(f"Total Cost (USD): ${cb.total_cost}")
 
 conversation = ConversationChain(llm=llm, verbose=True)
 
@@ -91,7 +97,12 @@ def update_conversation(click, text):
         # call bot with user inputted text
 
         #response = "Bye Bye"
-        agent_response = agent_chain.run(text)
+        with get_openai_callback() as cb:
+            agent_response = agent_chain.run(text)
+            print(f"Total Tokens: {cb.total_tokens}")
+            print(f"Prompt Tokens: {cb.prompt_tokens}")
+            print(f"Completion Tokens: {cb.completion_tokens}")
+            print(f"Total Cost (USD): ${cb.total_cost}")
         try:
             output_json = json.loads(agent_response)
             if 'file_path' in output_json:

@@ -1,13 +1,18 @@
 #
 #
-# A langchain tool that retrieves (fake) location recommendations.
+# A langchain tool that retreives location and radius to plot opportunity map
 #
 import json
-from typing import List
 from langchain.agents import Tool
 
-from arcgis_functions import get_block_group_map, get_block_group_map_with_opp_comp_score
+from typing import List
 
+from arcgis_functions import  get_block_group_map_with_opp_comp_score
+
+# import to read configs
+import sys
+sys.path.append('../../../../')
+from utils import get_gis_context
 
 
 def location_map_retreiver(
@@ -37,7 +42,7 @@ def location_map_retreiver(
     '''
     data = {}
 
-    verbal_desc_map = get_block_group_map_with_opp_comp_score(location, radius)  
+    verbal_desc_map = get_block_group_map_with_opp_comp_score(location, radius, get_gis_context())  
 
     # this function is a mockup, returns fake/hardcoded weather forecast data
     #data['utterance'] = 'location recommendation'
@@ -70,20 +75,12 @@ def location_recommendation(json_request: str) -> str:
     '''
     wraps the location_biz_type_retriever function,
     converting the input JSON in separated arguments.
-
-    Args:
-        request (str): The JSON dictionary input string.
-
-        Takes a JSON dictionary as input in the form:
-            { "location":"<location>", "food_biz_type":"<food_biz_type>", "specific_variables":["variable_name", ... ]}
-
-        Example:
-            { "location":"Chula Vista", "food_biz_type":"Mexican Grocery Store", "specific_variables":["humidity"]}
-
-    Returns:
-        The location and food business type.
     '''
-    arguments = json.loads(json_request)
+    ## Sometimes GPT is converting json with single quote  {'home_street_address': '581 Moss St', 'home_zip': '91911', 'home_city': 'Chula Vista', 'home_state': 'CA'}
+    ## instead of {"home_street_address": "581 Moss St", "home_zip": "91911", "home_city": "Chula Vista", "home_state": "CA"}
+    ## So adding this hack to make it work
+    json_string = json_request.replace("'", "\"") 
+    arguments = json.loads(json_string)
 
     
     location = arguments.get('location', None)
@@ -108,8 +105,7 @@ output_format = '{{"file_path":"file_path","verbal_desc":"verbal_desc","location
 ## json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 2 (char 1)
 description = f'''
 Helps to identify the intent of the question.
-Input must be valid JSON in the following format with double quotes. DO NOT USE SINGLE QUOTES.
-USE DOUBLE QUOTES. : {request_format}
+Input must be valid JSON in the following format with double quotes: {request_format}
 In the input format, do not add units for radius. Just keep a float value such as 2.0.
 Supply "specific_variables" list just if you really need them.
 If don't know the value to be assigned to a key, omit the key.

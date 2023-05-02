@@ -3,7 +3,10 @@ import os
 
 import psycopg2
 
+from arcgis.gis import GIS
+
 import pandas as pd
+
 
 def get_config(section_name,config_name):
     # Reading the configuration
@@ -13,6 +16,15 @@ def get_config(section_name,config_name):
     # print(str(parse))
     return config_details
     
+def get_gis_context():
+    '''
+    Return the GIS Object.
+    '''
+    username = get_config("arcgis","username")
+    password = get_config("arcgis","passkey")
+    gis = GIS("https://ucsdonline.maps.arcgis.com/home", username=username, password=password)
+    return gis
+
 def format_json(rings_json):    
     new_string = ""
 

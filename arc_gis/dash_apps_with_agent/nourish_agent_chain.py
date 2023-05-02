@@ -2,13 +2,16 @@ import sys
 
 from langchain import OpenAI, ConversationChain, LLMChain, PromptTemplate
 from langchain.memory import ConversationBufferMemory, ReadOnlySharedMemory
-from langchain.agents import ZeroShotAgent, Tool, AgentExecutor
+from langchain.agents import ZeroShotAgent, Tool, AgentExecutor 
+from langchain.callbacks import get_openai_callback
+
 
 # from tools_agent import agent
 from location_recommendation_tool import LocationRecommendation
 from load_registrant_tool import LoadRegistrant
 from load_registrant import get_welcome_prompt
 from funding_recommendation_tool import FundingRecommendation
+from nearest_sba_tool import NearestSBATool
 
 # import to read configs
 import sys
@@ -44,6 +47,7 @@ summry_chain = LLMChain(
 tools = [
          LoadRegistrant,
          LocationRecommendation,
+         NearestSBATool,
          FundingRecommendation,
          ]
 
@@ -73,8 +77,14 @@ if __name__ == '__main__':
         print('question: ' + question)
 
         # run the agent
-        answer = agent_chain.run(question)
-        print(answer)
+
+        with get_openai_callback() as cb:
+            answer = agent_chain.run(question)
+            print(answer)
+            print(f"Total Tokens: {cb.total_tokens}")
+            print(f"Prompt Tokens: {cb.prompt_tokens}")
+            print(f"Completion Tokens: {cb.completion_tokens}")
+            print(f"Total Cost (USD): ${cb.total_cost}")
     else:
         print('''Hi Mateo, you are looking to start a food truck business for fresh family-style meals 
               in the Chula Vista Bonita region and need funding to buy a food truck and pay for business licenses and fees. How can I help you?''')

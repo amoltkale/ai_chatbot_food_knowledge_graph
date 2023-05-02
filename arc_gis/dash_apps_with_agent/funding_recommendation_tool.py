@@ -38,7 +38,7 @@ def get_funding_prompt(*, email="m.hernandez@gmail.com"):
                 If they do not qualify for any loands, state the reason.
                 Phrase the response as if you are addressing the applicant.
                 """
-    print(template)
+    #print(template)
     return template
         # t["funding_program"]
 
