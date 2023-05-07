@@ -9,7 +9,7 @@ from pathlib import Path
 
 from langchain import OpenAI
 
-from app_utils import get_bot_response
+from llm_utils import get_bot_response
 
 import pandas as pd
 

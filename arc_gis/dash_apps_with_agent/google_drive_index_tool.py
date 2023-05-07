@@ -11,6 +11,9 @@ import sys
 sys.path.append('../../')
 from utils import get_config
 
+# To get relevant LLM(s)
+from llm_utils import get_gpt_4_openai_llm, get_default_openai_llm
+
 def create_indexes(service_context, file_name):
 
 
@@ -46,9 +49,8 @@ def read_indexes( service_context, file_name):
 if __name__ == '__main__':
     #print(Path.home())
 
-        # Prepare openai
-    ai_key = get_config("open_ai","key")
-    llm = OpenAI(temperature=0, verbose=True, model_name="gpt-4", openai_api_key=ai_key) # temp=0 for most reproducible results
+    # Prepare openai
+    llm = get_default_openai_llm()
     llm_predictor = LLMPredictor(llm=llm)
 
     # Configure prompt parameters and initialise helper
@@ -58,7 +60,6 @@ if __name__ == '__main__':
 
     prompt_helper = PromptHelper(max_input_size, num_output, max_chunk_overlap)
 
-
     service_context = ServiceContext.from_defaults(llm_predictor=llm_predictor, prompt_helper=prompt_helper)
 
     file_name = 'welcome_prompt_doc_index.json'
@@ -67,7 +68,6 @@ if __name__ == '__main__':
     index = read_indexes(service_context, file_name)
     # Querying the index
     while True:
-        prompt = input("Type prompt...")
+        prompt = input("Question: ")
         response = index.query(prompt)
         print(response)
-    #print(docs[0])

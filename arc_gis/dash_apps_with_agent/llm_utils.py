@@ -19,6 +19,10 @@ def get_bot_prediction(conversation, text):
     #TODO verifiy conversation is needed
     return conversation.predict(input=text)
 
-def openai_connect():
+def get_default_openai_llm(temperature=0):
     ai_key = get_config("open_ai","key")
-    return OpenAI(temperature=0, verbose=True, openai_api_key=ai_key)
+    return OpenAI(temperature=temperature, verbose=True, openai_api_key=ai_key)
+
+def get_gpt_4_openai_llm(temperature=0):
+    ai_key = get_config("open_ai","key")
+    return OpenAI(temperature=temperature, model_name="gpt-4", verbose=True, openai_api_key=ai_key)
