@@ -14,10 +14,11 @@ from langchain.document_loaders import GoogleDriveLoader
 
 sys.path.append('../../')
 from utils import get_config
+from llm_utils import get_gpt_4_openai_llm
 
 os.environ['OPENAI_API_KEY'] = get_config("open_ai","key")
 
-logging.basicConfig(stream=sys.stdout, level=logging.ERROR)
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
 
 resource_path = Path("../resources")
@@ -61,7 +62,8 @@ storage_context = StorageContext.from_defaults(persist_dir=str(index_storage_fol
 # load index
 index_read = load_index_from_storage(storage_context)
 
-llm_predictor = StructuredLLMPredictor()
+llm = get_gpt_4_openai_llm()
+llm_predictor = StructuredLLMPredictor(llm=llm)
 
 response_schemas = [
     ResponseSchema(name="QualifyingLoan", description="Describes the type of loans use may qualify for."),
