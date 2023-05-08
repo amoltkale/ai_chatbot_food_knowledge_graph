@@ -62,6 +62,7 @@ def create_rdf_index(*, file_p:Path, index_storage_folder:Path):
     return index
 
 def read_llm_index(*, index_storage_folder:Path):
+    os.environ['OPENAI_API_KEY'] = get_config("open_ai","key")
     if index_storage_folder is None:
         raise ValueError("Give valid path")
     # rebuild storage context
