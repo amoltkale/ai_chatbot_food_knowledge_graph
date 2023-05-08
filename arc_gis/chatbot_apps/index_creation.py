@@ -100,17 +100,34 @@ if __name__ == '__main__':
             I have less than 40 employees. What loans do I qualify for?
          """
     else:
-        create_rdf_index(file_p=Path("../resources/financial-ontology.rdf"), index_storage_folder=index_storage_folder)
+        # create_rdf_index(file_p=Path("../resources/financial-ontology.rdf"), index_storage_folder=index_storage_folder)
         # raise NotImplementedError
         index = read_llm_index(index_storage_folder=index_storage_folder)
         response_schemas = [
-            ResponseSchema(name="LoanType", description="Describes the type of loans."),
+            ResponseSchema(name="rdfInfo", description="Give information about the loans found"),
+            ResponseSchema(name="rdfName", description="Root node of RDF entity"),
+            ResponseSchema(name="rdfChildren", description="list of all children under root node of RDF entity"),
         ]
+        # request = """
+        #     What loans are available from the SBA?
+        #  """
+        # request = """
+        #     Who gives the 7a loan?
+        #  """
         request = """
-            What loans are available from the SBA?
+            What loans does the SBA offer?
          """
         # request = """
-        #     Is SBA 7(a) loan is an agreement?
+        #     What loans would a small business owner have access to?
+        #  """
+        # request = """
+        #     What loans would a farmer have access to?
+        #  """
+        # request = """
+        #     What loans does the USDA offer?
+        #  """
+        # request = """
+        #     I am trying to expand my farm. What loans do I qualify for?
         #  """
         # raise NotImplementedError
 
