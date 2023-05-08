@@ -3,7 +3,7 @@ import flask
 import webbrowser
 
 from load_registrant import *
-from app_utils import get_bot_response, get_bot_prediction # Rename to bot_utils
+from llm_utils import get_bot_response, get_bot_prediction, get_gpt_4_openai_llm # Rename to bot_utils
 
 import dash
 from dash.dependencies import Input, Output, State
@@ -29,7 +29,7 @@ STATIC_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
 
 # Prepare openai
 ai_key = get_config("open_ai","key")
-llm = OpenAI(temperature=0, verbose=True, openai_api_key=ai_key) # temp=0 for most reproducible results
+llm = get_gpt_4_openai_llm
 
 # intial_response = "Hello"
 with get_openai_callback() as cb:
@@ -39,10 +39,6 @@ with get_openai_callback() as cb:
     print(f"Completion Tokens: {cb.completion_tokens}")
     print(f"Total Cost (USD): ${cb.total_cost}")
 
-# conversation = ConversationChain(llm=llm, verbose=True)
-
-
-
 # init app and add stylesheet
 # Flask app 
 server = Flask(__name__)
@@ -51,9 +47,6 @@ app.css.append_css({"external_url": "https://codepen.io/chriddyp/pen/bWLwgP.css"
 
 # init a list of the sessions conversation history
 conv_hist = [html.H5(html.I(intial_response), style={'text-align': 'left'})] + [html.Hr()]
-
-
-
 
 # credit to initial UI: https://github.com/AdamSpannbauer/app_rasa_chat_bot/blob/master/dash_demo_app.py
 
@@ -126,7 +119,6 @@ def update_conversation(click, text):
 
         # append interaction to conversation history
         conv_hist = conv_hist + rcvd + rspd + [html.Hr()]
-        # conv_hist = conv_hist + rcvd + [html.Embed(src='./static/test_html.html')] + [html.Hr()]
 
         return "", conv_hist
     else:
