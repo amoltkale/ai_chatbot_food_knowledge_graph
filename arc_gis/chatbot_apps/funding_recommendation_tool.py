@@ -13,6 +13,7 @@ def get_funding_prompt(*, email="m.hernandez@gmail.com"):
     SELECT funding_program,
             use_of_funds || business_eligibility || application_requirements AS eligibility
     FROM funding_src
+    WHERE id = 3 OR id = 1 
     """
 
     obs = run_qry(conn, qry)
@@ -20,7 +21,7 @@ def get_funding_prompt(*, email="m.hernandez@gmail.com"):
                             "eligibility"])
     res_json = {}
     for t in funding_df.itertuples():
-        res_json[f"t.funding_program"] = t.eligibility
+        res_json[f"{t.funding_program}"] = t.eligibility
 
     funding_profile = get_user_funding_needs(conn, email=email)
     biz_profile = get_user_business_profile(conn, email=email)

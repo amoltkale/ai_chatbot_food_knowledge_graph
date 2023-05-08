@@ -31,6 +31,9 @@ STATIC_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
 ai_key = get_config("open_ai","key")
 llm = get_gpt_4_openai_llm
 
+# Get AI key
+os.environ['OPENAI_API_KEY'] = ai_key
+
 # intial_response = "Hello"
 with get_openai_callback() as cb:
     intial_response = agent_chain.run(get_welcome_prompt())
@@ -52,7 +55,7 @@ conv_hist = [html.H5(html.I(intial_response), style={'text-align': 'left'})] + [
 
 # app ui
 app.layout = html.Div([
-    html.H3('Fresh Start Chatbot', style={'text-align': 'center'}),
+    html.H3('Nourish Chatbot', style={'text-align': 'center'}),
     html.H4('Please answer all questions as accurately as possible. If you are unsure, please ask the bot to try again.',
             style={'text-align': 'center'}),
     html.Div([

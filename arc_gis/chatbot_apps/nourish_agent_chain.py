@@ -2,7 +2,7 @@ import sys
 
 from langchain import OpenAI, ConversationChain, LLMChain, PromptTemplate
 from langchain.memory import ConversationBufferMemory, ReadOnlySharedMemory
-from langchain.agents import ZeroShotAgent, Tool, AgentExecutor 
+from langchain.agents import ZeroShotAgent, Tool, AgentExecutor, ConversationalChatAgent, AgentType, initialize_agent
 from langchain.callbacks import get_openai_callback
 
 
@@ -12,14 +12,17 @@ from load_registrant_tool import LoadRegistrant
 from load_registrant import get_welcome_prompt
 from funding_recommendation_tool import FundingRecommendation
 from nearest_sba_tool import NearestSBATool
+from sba_doc_index_tool import SBADocIndexTool
 
 # import to read configs
 import sys
 sys.path.append('../../../../')
 from utils import get_config
 
+from llm_utils import get_gpt_4_openai_llm, get_default_openai_llm
+
 openaikey = get_config("open_ai","key")
-llm = OpenAI(temperature=0, openai_api_key=openaikey)
+llm = get_default_openai_llm()
 
 
 
@@ -47,8 +50,9 @@ summry_chain = LLMChain(
 tools = [
          LoadRegistrant,
          LocationRecommendation,
-         NearestSBATool,
-         FundingRecommendation,
+         #NearestSBATool,
+         #FundingRecommendation,
+         SBADocIndexTool
          ]
 
 prefix = """Have a conversation with a human, answering the following questions as best you can. You have access to the following tools:"""
@@ -58,16 +62,14 @@ suffix = """Begin!"
 Question: {input}
 {agent_scratchpad}"""
 
-prompt = ZeroShotAgent.create_prompt(
+
+prompt = ConversationalChatAgent.create_prompt(
     tools, 
-    prefix=prefix, 
-    suffix=suffix, 
     input_variables=["input", "chat_history", "agent_scratchpad"]
 )
 
-llm_chain = LLMChain(llm=llm, prompt=prompt)
-agent = ZeroShotAgent(llm_chain=llm_chain, tools=tools, verbose=True)
-agent_chain = AgentExecutor.from_agent_and_tools(agent=agent, tools=tools, verbose=True, memory=memory)
+
+agent_chain = initialize_agent(llm=llm, agent=AgentType.CONVERSATIONAL_REACT_DESCRIPTION, tools=tools, verbose=True, memory=memory)
 
 if __name__ == '__main__':
     chat_history = get_welcome_prompt()
