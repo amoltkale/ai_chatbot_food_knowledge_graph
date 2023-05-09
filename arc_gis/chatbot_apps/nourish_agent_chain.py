@@ -10,9 +10,12 @@ from langchain.callbacks import get_openai_callback
 from location_recommendation_tool import LocationRecommendation
 from load_registrant_tool import LoadRegistrant
 from load_registrant import get_welcome_prompt
+from llm_utils import bcolors
 from funding_recommendation_tool import FundingRecommendation
 from nearest_sba_tool import NearestSBATool
 from sba_doc_index_tool import SBADocIndexTool
+from funding_doc_index_tool import FundingDocIndexTool
+
 
 # import to read configs
 import sys
@@ -50,17 +53,12 @@ summry_chain = LLMChain(
 tools = [
          LoadRegistrant,
          LocationRecommendation,
-         #NearestSBATool,
+         NearestSBATool,
          #FundingRecommendation,
+         FundingDocIndexTool,
          SBADocIndexTool
          ]
 
-prefix = """Have a conversation with a human, answering the following questions as best you can. You have access to the following tools:"""
-suffix = """Begin!"
-
-{chat_history}
-Question: {input}
-{agent_scratchpad}"""
 
 
 prompt = ConversationalChatAgent.create_prompt(
@@ -73,7 +71,11 @@ agent_chain = initialize_agent(llm=llm, agent=AgentType.CONVERSATIONAL_REACT_DES
 
 if __name__ == '__main__':
     chat_history = get_welcome_prompt()
-    agent_chain.run(chat_history)
+    with get_openai_callback() as cb:
+        agent_chain.run(chat_history)
+        print(cb)
+
+
     if len(sys.argv) > 1:
         question = ' '.join(sys.argv[1:])
         print('question: ' + question)
@@ -88,5 +90,10 @@ if __name__ == '__main__':
             print(f"Completion Tokens: {cb.completion_tokens}")
             print(f"Total Cost (USD): ${cb.total_cost}")
     else:
-        print('''Hi Mateo, you are looking to start a food truck business for fresh family-style meals 
-              in the Chula Vista Bonita region and need funding to buy a food truck and pay for business licenses and fees. How can I help you?''')
+        # Querying the index
+        while True:
+            prompt = input(f"{bcolors.BOLD}Question:{bcolors.ENDC}")
+            with get_openai_callback() as cb:
+                answer = agent_chain.run(prompt)
+                print(cb)
+            print(f"{bcolors.OKCYAN}{answer}{bcolors.ENDC}")

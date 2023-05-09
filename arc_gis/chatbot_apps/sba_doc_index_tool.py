@@ -5,17 +5,13 @@ from langchain.agents import Tool
 
 from index_creation import read_llm_index
 
-# import to read configs
-import sys
-sys.path.append('../../../../')
-from utils import get_gis_context
-
 resource_path = Path("../resources")
 index_storage_folder = resource_path / "sba_doc_indexes"
 
 index = read_llm_index(index_storage_folder=index_storage_folder)
 
 name = 'sba_doc_index'
+
 description = f'''
 Useful for when you want to answer questions about the information or explaination on loans from documents.
 '''

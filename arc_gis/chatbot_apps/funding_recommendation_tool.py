@@ -2,9 +2,6 @@ from langchain.agents import Tool
 
 import pandas as pd
 
-import sys
-
-sys.path.append('../')
 from load_registrant import server_connect, run_qry, get_user_funding_needs, get_user_business_profile
 
 def get_funding_prompt(*, email="m.hernandez@gmail.com"):
