@@ -39,13 +39,12 @@ def nearest_sba(json_request: str) -> str:
 
 name = 'nearest_sba'
 request_format = '{{"home_street_address":"home_street_address","home_zip":"home_zip","home_city":"home_city", "home_state":"home_state","organization_name":"organization_name","contact_instruction":"contact_instruction","specific_variables":["variable_name"]}}'
-output_format = '{{"nearest_sba":"facility_address","sba_name":"sba_name","organization_name":"organization_name","contact_number":"contact_number","distance":"distance_in_miles","specific_variables":["variable_name"]}}'
+output_format = '{{"nearest_facility":"facility_address","facility_name":"facility_name","organization_name":"organization_name","contact_number":"contact_number","distance":"distance_in_miles","specific_variables":["variable_name"]}}'
 
 ## We were getting the below error:
 ## json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 2 (char 1)
 description = f'''
-Anwser "Whom should I contact for this ?".
-Helps identify the query "It is about loan information contact or Small Business Development Agency or SBA or Small Business Administrations or 
+Gives contact information on nearest Small Business Development Agency / SBA / Small Business Administrations /
 Small Business Development Agency affiliated with the SBA."
 Input must be valid JSON in the following format with double quotes on the keys and values : {request_format}
 The address should abide by the standard of  United States of America.

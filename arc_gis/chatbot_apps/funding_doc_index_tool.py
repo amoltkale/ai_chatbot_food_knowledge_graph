@@ -18,10 +18,11 @@ index = read_llm_index(index_storage_folder=index_storage_folder)
 
 name = 'funding_doc_index'
 description = f'''
-                REMEMBER YOU ARE TALKING DIRECTLY TO THE USER.
-                If the Application is eligible for any loan, tell them the loan name.
+                Converse as if you are talking to a person who is in high school.
+                If the person is eligible for any loan, tell them the loan name. 
+                Additionaly provide brief one sentece description on each of them.
                 If they do not qualify for any loans, state the reason.
-                Phrase the response as if you are addressing the applicant.
+                Phrase the response as if you are addressing the person.
 '''
 # create an instance of the custom langchain tool
 FundingDocIndexTool = Tool(

@@ -43,12 +43,13 @@ prompt = PromptTemplate(
 )
 memory = ConversationBufferMemory(memory_key="chat_history")
 readonlymemory = ReadOnlySharedMemory(memory=memory)
-summry_chain = LLMChain(
-    llm=llm, 
-    prompt=prompt, 
-    verbose=True, 
-    memory=readonlymemory, # use the read-only memory to prevent the tool from modifying the memory
-)
+readonlymemory.clear()
+# summry_chain = LLMChain(
+#     llm=llm, 
+#     prompt=prompt, 
+#     verbose=True, 
+#     memory=readonlymemory, # use the read-only memory to prevent the tool from modifying the memory
+# )
 
 tools = [
          LoadRegistrant,
@@ -67,7 +68,7 @@ prompt = ConversationalChatAgent.create_prompt(
 )
 
 
-agent_chain = initialize_agent(llm=llm, agent=AgentType.CONVERSATIONAL_REACT_DESCRIPTION, tools=tools, verbose=True, memory=memory)
+agent_chain = initialize_agent(llm=llm, agent=AgentType.CONVERSATIONAL_REACT_DESCRIPTION, tools=tools, verbose=True, memory=readonlymemory)
 
 if __name__ == '__main__':
     chat_history = get_welcome_prompt()
@@ -92,8 +93,10 @@ if __name__ == '__main__':
     else:
         # Querying the index
         while True:
-            prompt = input(f"{bcolors.BOLD}Question:{bcolors.ENDC}")
+            prompt = input(f"{bcolors.WARNING}Question: {bcolors.ENDC}")
+            print(f"{bcolors.WARNING}{prompt}{bcolors.ENDC}")
             with get_openai_callback() as cb:
                 answer = agent_chain.run(prompt)
                 print(cb)
             print(f"{bcolors.OKCYAN}{answer}{bcolors.ENDC}")
+    readonlymemory.clear()
