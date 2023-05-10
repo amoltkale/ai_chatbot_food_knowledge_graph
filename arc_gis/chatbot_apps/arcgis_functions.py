@@ -15,7 +15,10 @@ import pandas as pd
 
 import sys
 sys.path.append('../../')
-from utils import get_config
+from utils import get_config, get_gis_context
+
+sys.path.append('../')
+from gis_resources import SD_BLOCK_GROUP_OPPORTUNITY_SCORE_LAYER, SBA_FEATURE_LAYER
 
 
 from ipywidgets.embed import embed_minimal_html
@@ -130,7 +133,7 @@ def get_block_group_map_with_opp_comp_score(region, radius, gis):
     #openaikey = get_config("open_ai","key")
     #llm = OpenAI(temperature=0, openai_api_key=openaikey)
 
-    ft_lyr = FeatureLayer(url="https://services1.arcgis.com/eGSDp8lpKe5izqVc/arcgis/rest/services/a3eb8f/FeatureServer/0")
+    ft_lyr = SD_BLOCK_GROUP_OPPORTUNITY_SCORE_LAYER
 
     region_address = geocode(address=region,
                     max_locations = 1
@@ -259,6 +262,7 @@ def nearest_facility(originating_address, facilities_feat_lyr, gis, as_df=False,
     df1['originating_address'] = [originating_address_feature.attributes['Match_addr'] for i in range(count_of_facilities)]
     df1['contact_number'] = contact_numbers
     df1['organization_name'] = org_names_list
+    df1['Total_Miles'] = df1['Total_Miles'].round(1)
 
     df1 = df1[['facility_address','originating_address','contact_number','organization_name','Total_Miles']]
 
@@ -277,10 +281,7 @@ def nearest_facility(originating_address, facilities_feat_lyr, gis, as_df=False,
 
 if __name__ == '__main__':
     # print(get_block_group_map('Bonita, San Diego',2.0)["verbal_desc"])
-    username = get_config("arcgis","username")
-    password = get_config("arcgis","passkey")
-    gis = GIS("https://ucsdonline.maps.arcgis.com/home", username=username, password=password)
+    gis = get_gis_context()
     originating_address = '581 Moss St, 91911, Chula Vista, CA'
-    sba_feat_layer = FeatureLayer(gis= gis, url = "https://services1.arcgis.com/eGSDp8lpKe5izqVc/arcgis/rest/services/a8d231/FeatureServer/0")
-    nearest_facility_json = nearest_facility(originating_address, facilities_feat_lyr=sba_feat_layer, gis =gis, as_df=False, return_all_facilities=False)
+    nearest_facility_json = nearest_facility(originating_address, facilities_feat_lyr=SBA_FEATURE_LAYER, gis =gis, as_df=False, return_all_facilities=False)
     print(nearest_facility_json)

@@ -12,6 +12,9 @@ import sys
 sys.path.append('../../../../')
 from utils import get_gis_context
 
+sys.path.append('../../')
+from gis_resources import SBA_FEATURE_LAYER
+
 
 def nearest_sba(json_request: str) -> str:
 
@@ -30,9 +33,7 @@ def nearest_sba(json_request: str) -> str:
 
     gis = get_gis_context()
 
-    sba_feat_layer = FeatureLayer(gis= gis, url = "https://services1.arcgis.com/eGSDp8lpKe5izqVc/arcgis/rest/services/a8d231/FeatureServer/0")
-
-    nearest_sba_json = nearest_facility(originating_address=f"{home_street_address}, {home_zip}, {home_city}, {home_state}", facilities_feat_lyr=sba_feat_layer, gis=gis)
+    nearest_sba_json = nearest_facility(originating_address=f"{home_street_address}, {home_zip}, {home_city}, {home_state}", facilities_feat_lyr=SBA_FEATURE_LAYER, gis=gis)
 
     return json.dumps(nearest_sba_json)
 
@@ -41,8 +42,6 @@ name = 'nearest_sba'
 request_format = '{{"home_street_address":"home_street_address","home_zip":"home_zip","home_city":"home_city", "home_state":"home_state","organization_name":"organization_name","contact_instruction":"contact_instruction","specific_variables":["variable_name"]}}'
 output_format = '{{"nearest_facility":"facility_address","facility_name":"facility_name","organization_name":"organization_name","contact_number":"contact_number","distance":"distance_in_miles","specific_variables":["variable_name"]}}'
 
-## We were getting the below error:
-## json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 2 (char 1)
 description = f'''
 Gives contact information on nearest Small Business Development Agency / SBA / Small Business Administrations /
 Small Business Development Agency affiliated with the SBA."
@@ -50,7 +49,6 @@ Input must be valid JSON in the following format with double quotes on the keys 
 The address should abide by the standard of  United States of America.
 If you don't know the value to be assigned to a key, omit the key.
 Output must be valid JSON in the following format: {output_format}. 
-Round off the distance in miles to 2 decimal places.
 Try to refer Small Business Development Agency instead of SBA while responding.
 '''
 

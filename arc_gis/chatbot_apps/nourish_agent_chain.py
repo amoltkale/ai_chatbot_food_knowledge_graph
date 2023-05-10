@@ -52,7 +52,7 @@ readonlymemory.clear()
 # )
 
 tools = [
-         LoadRegistrant,
+         #LoadRegistrant,
          LocationRecommendation,
          NearestSBATool,
          #FundingRecommendation,
