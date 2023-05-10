@@ -42,8 +42,8 @@ prompt = PromptTemplate(
     template=template
 )
 memory = ConversationBufferMemory(memory_key="chat_history")
-readonlymemory = ReadOnlySharedMemory(memory=memory)
-readonlymemory.clear()
+#readonlymemory = ReadOnlySharedMemory(memory=memory)
+#readonlymemory.clear()
 # summry_chain = LLMChain(
 #     llm=llm, 
 #     prompt=prompt, 
@@ -68,7 +68,7 @@ prompt = ConversationalChatAgent.create_prompt(
 )
 
 
-agent_chain = initialize_agent(llm=llm, agent=AgentType.CONVERSATIONAL_REACT_DESCRIPTION, tools=tools, verbose=True, memory=readonlymemory)
+agent_chain = initialize_agent(llm=llm, agent=AgentType.CONVERSATIONAL_REACT_DESCRIPTION, tools=tools, verbose=True, memory=memory)
 
 if __name__ == '__main__':
     chat_history = get_welcome_prompt()
@@ -99,4 +99,4 @@ if __name__ == '__main__':
                 answer = agent_chain.run(prompt)
                 print(cb)
             print(f"{bcolors.OKCYAN}{answer}{bcolors.ENDC}")
-    readonlymemory.clear()
+    memory.clear()
