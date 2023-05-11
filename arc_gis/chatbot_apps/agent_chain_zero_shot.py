@@ -42,17 +42,10 @@ prompt = PromptTemplate(
     template=template
 )
 memory = ConversationBufferMemory(memory_key="chat_history")
-#readonlymemory = ReadOnlySharedMemory(memory=memory)
-#readonlymemory.clear()
-# summry_chain = LLMChain(
-#     llm=llm, 
-#     prompt=prompt, 
-#     verbose=True, 
-#     memory=readonlymemory, # use the read-only memory to prevent the tool from modifying the memory
-# )
+
 
 tools = [
-         #LoadRegistrant,
+         LoadRegistrant,
          LocationRecommendation,
          NearestSBATool,
          #FundingRecommendation,
@@ -62,13 +55,24 @@ tools = [
 
 
 
-prompt = ConversationalChatAgent.create_prompt(
+prefix = """Have a conversation with a human, answering the following questions as best you can. You have access to the following tools:"""
+suffix = """Begin!"
+
+{chat_history}
+Question: {input}
+{agent_scratchpad}"""
+
+prompt = ZeroShotAgent.create_prompt(
     tools, 
+    prefix=prefix, 
+    suffix=suffix, 
     input_variables=["input", "chat_history", "agent_scratchpad"]
 )
 
 
-agent_chain = initialize_agent(llm=llm, agent=AgentType.CONVERSATIONAL_REACT_DESCRIPTION, tools=tools, verbose=True, memory=memory)
+llm_chain = LLMChain(llm=llm, prompt=prompt)
+agent = ZeroShotAgent(llm_chain=llm_chain, tools=tools, verbose=True)
+agent_chain = AgentExecutor.from_agent_and_tools(agent=agent, tools=tools, verbose=True, memory=memory)
 
 if __name__ == '__main__':
     chat_history = get_welcome_prompt()
@@ -99,4 +103,4 @@ if __name__ == '__main__':
                 answer = agent_chain.run(prompt)
                 print(cb)
             print(f"{bcolors.OKCYAN}{answer}{bcolors.ENDC}")
-    memory.clear()
+  
