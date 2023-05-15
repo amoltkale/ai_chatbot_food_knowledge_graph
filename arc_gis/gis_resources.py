@@ -17,6 +17,7 @@ from utils import get_gis_context
 gis = get_gis_context()
 SD_BLOCK_GROUP_OPPORTUNITY_SCORE_LAYER = FeatureLayer(url="https://services1.arcgis.com/eGSDp8lpKe5izqVc/arcgis/rest/services/a3eb8f/FeatureServer/0")
 SBA_FEATURE_LAYER = FeatureLayer(gis= gis, url = "https://services1.arcgis.com/eGSDp8lpKe5izqVc/arcgis/rest/services/a8d231/FeatureServer/0")
+SANDAG_MGRA_FEATURE_LAYER = FeatureLayer(gis=gis, url="https://services1.arcgis.com/eGSDp8lpKe5izqVc/arcgis/rest/services/SANDAG_MGRA13/FeatureServer/0")
 
 
 def san_diego_county_zips():

@@ -10,7 +10,6 @@ from langchain.callbacks import get_openai_callback
 from location_recommendation_tool import LocationRecommendation
 from load_registrant_tool import LoadRegistrant
 from load_registrant import get_welcome_prompt
-from llm_utils import bcolors
 from funding_recommendation_tool import FundingRecommendation
 from nearest_sba_tool import NearestSBATool
 from sba_doc_index_tool import SBADocIndexTool
@@ -20,7 +19,7 @@ from funding_doc_index_tool import FundingDocIndexTool
 # import to read configs
 import sys
 sys.path.append('../../../../')
-from utils import get_config
+from utils import get_config, bcolors, print_in_color
 
 from llm_utils import get_gpt_4_openai_llm, get_default_openai_llm
 
@@ -29,10 +28,10 @@ llm = get_default_openai_llm()
 
 
 tools = [
-         LoadRegistrant,
+         # LoadRegistrant,
          LocationRecommendation,
          NearestSBATool,
-         #FundingRecommendation,
+         # FundingRecommendation,
          FundingDocIndexTool,
          SBADocIndexTool
          ]
@@ -69,24 +68,25 @@ if __name__ == '__main__':
 
     if len(sys.argv) > 1:
         question = ' '.join(sys.argv[1:])
-        print('question: ' + question)
+        print_in_color('Question: ' + question, bcolors.YELLOW)
 
         # run the agent
 
         with get_openai_callback() as cb:
             answer = agent_chain.run(question)
-            print(answer)
-            print(f"Total Tokens: {cb.total_tokens}")
-            print(f"Prompt Tokens: {cb.prompt_tokens}")
-            print(f"Completion Tokens: {cb.completion_tokens}")
-            print(f"Total Cost (USD): ${cb.total_cost}")
+            print_in_color(answer, bcolors.CYAN)
+            print_in_color(cb, bcolors.PURPLE)
     else:
         # Querying the index
         while True:
-            prompt = input(f"{bcolors.WARNING}Question: {bcolors.ENDC}")
-            print(f"{bcolors.WARNING}{prompt}{bcolors.ENDC}")
+            question = input("Question: ")
+            if question == 'bye':
+                break
+            print_in_color(f"Question: {question}", bcolors.YELLOW)
             with get_openai_callback() as cb:
-                answer = agent_chain.run(prompt)
-                print(cb)
-            print(f"{bcolors.OKCYAN}{answer}{bcolors.ENDC}")
-  
+                answer = agent_chain.run(question)
+                print_in_color(cb, bcolors.PURPLE)
+            print_in_color(answer, bcolors.CYAN)
+            #print_in_color(f"MEMEORY STORED: {agent_chain.memory.buffer}", bcolors.PURPLE)
+            
+    print_in_color(f"Chat history from memory:\n {agent_chain.memory.buffer}", bcolors.AMBER)

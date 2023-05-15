@@ -8,6 +8,24 @@ from arcgis.gis import GIS
 import pandas as pd
 
 
+class bcolors:
+    HEADER = '\033[95m'
+    BLUE = '\033[94m'
+    CYAN = '\033[96m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+    PURPLE = '\033[35m'       # Purple
+    WHITE = '\033[37m'
+    WHITE_BG = '\033[47m'
+    AMBER = '\u001b[38;5;215m'
+
+def print_in_color(text,color=bcolors.WHITE):
+    print(f"{color}{text}{bcolors.ENDC}")
+
 def get_config(section_name,config_name):
     # Reading the configuration
     parse = configparser.ConfigParser()
