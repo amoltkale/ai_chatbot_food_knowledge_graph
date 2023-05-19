@@ -17,7 +17,7 @@ from langchain.callbacks import get_openai_callback
 
 # from tools_agent import agent
 from location_recommendation_tool import LocationRecommendation
-from nourish_agent_chain import agent_chain
+from agent_chain_conversational import agent_chain
 
 import json
 
