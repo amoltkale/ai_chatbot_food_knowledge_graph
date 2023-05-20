@@ -87,12 +87,12 @@ def create_all_doc_indexes():
     resource_path = Path("../resources")
     start = time.process_time()
     create_gdrive_index(folder_id="1PwdIP7WCHrr3LNDHUAs0aU5B0hPmyQJg", index_storage_folder=resource_path / "sba_doc_indexes")
-    end = time.process_time() - start
+    end = time.process_time()
     print_in_color(f"SBA elapsed time: {timedelta(seconds=end-start)}", bcolors.AMBER)
     #USDA
     start = time.process_time()
     create_gdrive_index(folder_id="1yyyyc2upDaxy9R7Ul2i8e0l23Vz9rOY3", index_storage_folder=resource_path / "usda_doc_indexes")
-    end = time.process_time() - start
+    end = time.process_time()
     print_in_color(f"USDA elapsed time: {timedelta(seconds=end-start)}", bcolors.AMBER)
 
 
