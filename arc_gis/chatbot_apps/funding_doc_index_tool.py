@@ -1,13 +1,13 @@
-
+import os
 from pathlib import Path
 
 from langchain.agents import Tool
 
 from index_creation import read_llm_index
-from load_registrant import server_connect, run_qry, get_user_funding_needs, get_user_business_profile
+from load_registrant import server_connect, get_email, get_user_funding_needs, get_user_business_profile
 
 conn = server_connect()
-email="m.hernandez@gmail.com"
+email=get_email()
 funding_profile = get_user_funding_needs(conn, email=email)
 biz_profile = get_user_business_profile(conn, email=email)
 

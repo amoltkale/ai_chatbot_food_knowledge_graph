@@ -2,9 +2,10 @@ from langchain.agents import Tool
 
 import pandas as pd
 
-from load_registrant import server_connect, run_qry, get_user_funding_needs, get_user_business_profile
+from load_registrant import server_connect, run_qry, get_user_funding_needs, get_user_business_profile, get_email
 
-def get_funding_prompt(*, email="m.hernandez@gmail.com"):
+def get_funding_prompt():
+    email = get_email()
     conn = server_connect()
     qry = """
     SELECT funding_program,

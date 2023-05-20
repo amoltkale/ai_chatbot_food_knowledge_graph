@@ -8,7 +8,30 @@ import pandas as pd
 sys.path.append('../../')
 from utils import get_config
 
-def get_welcome_prompt(*, id=32, email="m.hernandez@gmail.com"):
+def verify_user(email:str) -> bool:
+    conn = server_connect()
+    qry = f'''
+            select count(*) as count
+            from registrants
+            where '{email}' = any(email)
+            '''
+    obs = run_qry(conn, qry)
+    if obs[0][0] > 0:
+        return True
+    else:
+        return False
+    
+def set_enviro_email(email:str):
+    if not verify_user(email):
+        raise ValueError("Invalid Email given. Please try again")
+    else:
+        os.environ["USEREMAIL"] = email
+
+def get_email() -> str:
+    return os.environ["USEREMAIL"]
+
+def get_welcome_prompt():
+    email=get_email()
     conn = server_connect()
     # user_df = load_user(conn, id=id)
 
