@@ -16,6 +16,8 @@ sys.path.append('../../')
 from utils import get_config
 from llm_utils import get_gpt_4_openai_llm
 
+os.environ['OPENAI_API_KEY'] = get_config("open_ai","key")
+
 def create_gdrive_index(*, folder_id:str, index_storage_folder:Path):
     # ## Reading Google Drive Folder
     # GoogleDriveReader = download_loader("GoogleDriveReader")
@@ -78,12 +80,20 @@ def read_llm_index(*, index_storage_folder:Path):
     return index
 
 def create_all_doc_indexes():
+    import time
+    from datetime import timedelta
+    from utils import bcolors, print_in_color
     # SBA
     resource_path = Path("../resources")
+    start = time.process_time()
     create_gdrive_index(folder_id="1PwdIP7WCHrr3LNDHUAs0aU5B0hPmyQJg", index_storage_folder=resource_path / "sba_doc_indexes")
+    end = time.process_time() - start
+    print_in_color(f"SBA elapsed time: {timedelta(seconds=end-start)}", bcolors.AMBER)
     #USDA
+    start = time.process_time()
     create_gdrive_index(folder_id="1yyyyc2upDaxy9R7Ul2i8e0l23Vz9rOY3", index_storage_folder=resource_path / "usda_doc_indexes")
-
+    end = time.process_time() - start
+    print_in_color(f"USDA elapsed time: {timedelta(seconds=end-start)}", bcolors.AMBER)
 
 
 if __name__ == '__main__':
@@ -129,9 +139,15 @@ if __name__ == '__main__':
     #     # request = """
     #     #     Who gives the 7a loan?
     #     #  """
+    #     # request = """
+    #     #     What forms are related to the 7a loan?
+    #     #  """
     #     request = """
-    #         What loans does the SBA offer?
+    #         What is form 1920?
     #      """
+    #     # request = """
+    #     #     What loans does the SBA offer?
+    #     #  """
     #     # request = """
     #     #     What loans would a small business owner have access to?
     #     #  """
