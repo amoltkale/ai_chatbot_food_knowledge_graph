@@ -18,7 +18,7 @@ Useful for when you want to answer questions about the information or explainati
 # create an instance of the custom langchain tool
 SBADocIndexTool = Tool(
     name=name,
-    func=lambda q: str(index.as_query_engine().query(q)),
+    func=lambda q: str(index.as_query_engine().query(f"Find information on loan. {q}")),
     description=description,
     return_direct=True
 )
