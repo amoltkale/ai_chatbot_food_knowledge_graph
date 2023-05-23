@@ -1,6 +1,6 @@
 from typing import List, Optional, Tuple, Dict
 
-from neo4j import GraphDatabase
+from neo4j import GraphDatabase, Result
 import sys
 sys.path.append('../../')
 from utils import get_config
@@ -22,7 +22,21 @@ class Neo4jDatabase:
         with self.driver.session() as session:
             result = session.run(cypher_query, params)
             # Limit to at most 50 results
-            return [r.values()[0] for r in result][:50]
+            return [r.values()[0] for r in result]
+        
+    def query_no_throw(self, cypher_query: str, fetch: str = "all") -> str:
+        """Execute a Cypher command and return a string representing the results.
+
+        If the statement returns rows, a string of the results is returned.
+        If the statement returns no rows, an empty string is returned.
+
+        If the statement throws an error, the error message is returned.
+        """
+        try:
+            return self.query(cypher_query, fetch)
+        except Exception as e:
+            """Format the error message"""
+            return f"Error: {e}"
 
 
 if __name__ == "__main__":
