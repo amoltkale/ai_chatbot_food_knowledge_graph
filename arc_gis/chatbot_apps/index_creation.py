@@ -142,14 +142,17 @@ if __name__ == '__main__':
     #     # request = """
     #     #     What forms are related to the 7a loan?
     #     #  """
+    #     # request = """
+    #     #     What is form 1920?
+    #     #  """
     #     request = """
-    #         What is form 1920?
+    #         What loans does the SBA offer?
     #      """
     #     # request = """
-    #     #     What loans does the SBA offer?
+    #     #     What loans would a small business have access to?
     #     #  """
     #     # request = """
-    #     #     What loans would a small business owner have access to?
+    #     #     List all loans and grants available for a small business
     #     #  """
     #     # request = """
     #     #     What loans would a farmer have access to?

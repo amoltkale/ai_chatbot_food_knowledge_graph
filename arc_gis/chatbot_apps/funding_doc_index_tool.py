@@ -6,15 +6,31 @@ from langchain.agents import Tool
 from index_creation import read_llm_index
 from load_registrant import server_connect, get_email, get_user_funding_needs, get_user_business_profile
 
-conn = server_connect()
-email=get_email()
-funding_profile = get_user_funding_needs(conn, email=email)
-biz_profile = get_user_business_profile(conn, email=email)
+'''
+Long term strategy:
+All valid docs for given state and time period should be made into single doc index
+index can then be filtered before LLM is queried using node preprocessor and tags
+Things that should be filtered: Specific state vs federal
+'''
 
 resource_path = Path("../resources")
 index_storage_folder = resource_path / "sba_doc_indexes"
 
 index = read_llm_index(index_storage_folder=index_storage_folder)
+
+conn = server_connect()
+email=get_email()
+
+# Get user profiles
+funding_profile = get_user_funding_needs(conn, email=email)
+biz_profile = get_user_business_profile(conn, email=email)
+
+# Get any special tags
+# ie: vetran, woman, etc
+#TODO
+
+# Query ontology to determine what loans to look at
+#TODO
 
 name = 'funding_doc_index'
 description = f'''
@@ -25,6 +41,7 @@ description = f'''
                 If they do not qualify for any loans, state the reason.
                 REMEMBER YOU ARE TALKING DIRECTLY TO THE PERSON.
                 RESPOND IN FIRST PERSON ONLY.
+                DO NOT LOSE ANY INFORMATION WHEN YOU REFORMAT THE THOUGHT.
 '''
 # create an instance of the custom langchain tool
 FundingDocIndexTool = Tool(
