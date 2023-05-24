@@ -36,6 +36,25 @@ class BaseNeo4jDatabaseTool(BaseModel):
         arbitrary_types_allowed = True
         extra = Extra.forbid
 
+class CypherFullTextSearchQueryBaseTool(BaseNeo4jDatabaseTool,BaseTool):
+    """Tool to create the cypher query according to the questions asked."""
+    name = "cypher_full_text_search"
+    description = """
+    Input to this tool is instruction to do a full text search on food type, output is a cypher query with corerct syntax for neo4j dabase.
+
+    Example:
+    Given a food type = apple slice in the questions, the cypher query would be :
+    CALL db.index.fulltext.queryNodes("label_index", "apple slice") YIELD node, score RETURN node.iri, node.label, score
+    """
+
+class CypherGetRelatedNodesBaseTool(BaseNeo4jDatabaseTool,BaseTool):
+    """Tool to create the cypher query according to the questions asked."""
+    name = "cypher_get_related_nodes"
+    description = """
+    Input to this tool is instruction to use a food type, output is a cypher query with corerct syntax for neo4j dabase.
+    neo4j database, 
+    """
+
 class QueryNeo4jDataBaseTool(BaseNeo4jDatabaseTool,BaseTool):
     """Tool for querying a Neo4j database."""
 
@@ -118,8 +137,9 @@ class Neo4jDatabaseToolkit(BaseToolkit):
     def get_tools(self) -> List[BaseTool]:
         """Get the tools in the toolkit."""
         return [
+            CreateNeo4jDataBaseTool(db=self.db),
             QueryNeo4jDataBaseTool(db=self.db),
-            InfoNeo4jDatabaseTool(db=self.db),
+            #InfoNeo4jDatabaseTool(db=self.db),
             #ListNeo4jDatabaseTool(db=self.db),
             #CypherQueryCheckerTool(db=self.db, llm=self.llm),
         ]
