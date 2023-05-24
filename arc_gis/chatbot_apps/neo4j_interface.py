@@ -24,7 +24,7 @@ from neo4j_database import Neo4jDatabase
 from pydantic import Field
 
 class BaseNeo4jDatabaseTool(BaseModel):
-    """Base tool for interacting with a SQL database."""
+    """Base tool for interacting with a Neo4j database."""
 
     db: Neo4jDatabase = Field(exclude=True)
 
@@ -36,8 +36,7 @@ class BaseNeo4jDatabaseTool(BaseModel):
         arbitrary_types_allowed = True
         extra = Extra.forbid
 
-class QueryNeo4jDataBaseTool(BaseTool):
-    db: Neo4jDatabase = Field(exclude=True)
+class QueryNeo4jDataBaseTool(BaseNeo4jDatabaseTool,BaseTool):
     """Tool for querying a Neo4j database."""
 
     name = "query_neo4j_db"
@@ -53,7 +52,7 @@ class QueryNeo4jDataBaseTool(BaseTool):
         run_manager: Optional[CallbackManagerForToolRun] = None,
     ) -> str:
         """Execute the query, return the results or an error message."""
-        return self.db.run_no_throw(query)
+        return self.db.query_no_throw(query)
 
     async def _arun(
         self,
@@ -62,7 +61,7 @@ class QueryNeo4jDataBaseTool(BaseTool):
     ) -> str:
         raise NotImplementedError("QuerySqlDbTool does not support async")
 
-class InfoNeo4jDatabaseTool(BaseTool):
+class InfoNeo4jDatabaseTool(BaseNeo4jDatabaseTool, BaseTool):
     """Tool for getting metadata about a Neo4j database."""
 
     name = "schema_neo4j_db"
@@ -88,7 +87,7 @@ class InfoNeo4jDatabaseTool(BaseTool):
     ) -> str:
         raise NotImplementedError("SchemaSqlDbTool does not support async")
 
-class ListNeo4jDatabaseTool(BaseTool):
+class ListNeo4jDatabaseTool(BaseNeo4jDatabaseTool, BaseTool):
     """Tool for getting list of all node labels and relationship labels."""
 
     name = "get_node_and_egde_labels"

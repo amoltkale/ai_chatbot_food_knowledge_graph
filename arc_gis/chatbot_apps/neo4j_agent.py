@@ -15,3 +15,5 @@ if __name__ == "__main__":
         toolkit=toolkit,
         verbose=True
         )
+    
+    agent_executor.run("Describe the playlisttrack table")
