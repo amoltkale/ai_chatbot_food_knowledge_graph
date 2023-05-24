@@ -18,16 +18,18 @@ index = read_llm_index(index_storage_folder=index_storage_folder)
 
 name = 'funding_doc_index'
 description = f'''
-                Converse as if you are talking to a person who is in high school.
-                If the person is eligible for any loan, tell them the loan name. 
-                Additionaly provide brief one sentece description on each of them.
+                You are assisting a person with a high school education.
+                REMEMBER YOU ARE TALKING DIRECTLY TO THE PERSON.
+                Find any loans the person might qualify for based on their funding needs and business profile. 
+                Additionally provide brief one sentence description for any loans found.
                 If they do not qualify for any loans, state the reason.
-                Phrase the response as if you are addressing the person.
+                REMEMBER YOU ARE TALKING DIRECTLY TO THE PERSON.
+                RESPOND IN FIRST PERSON ONLY.
 '''
 # create an instance of the custom langchain tool
 FundingDocIndexTool = Tool(
     name=name,
-    func=lambda q: str(index.as_query_engine().query(f"Given the user has funding needs: {funding_profile} and users business profile is {biz_profile}. {q}")),
+    func=lambda q: str(index.as_query_engine().query(f"Find loans based on the funding needs: {funding_profile} and business profile: {biz_profile}. {q}")),
     description=description,
-    return_direct=True
+    return_direct=False
 )
