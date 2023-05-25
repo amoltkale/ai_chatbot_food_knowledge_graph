@@ -37,10 +37,9 @@ def setup_agent_chain():
 
     tools = [
             # LoadRegistrant,
-            # FundingRecommendation,
+            LocationRecommendation,
             FundingDocIndexTool,
             SBADocIndexTool,
-            LocationRecommendation,
             NearestSBATool,
             ]
 

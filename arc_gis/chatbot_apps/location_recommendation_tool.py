@@ -17,8 +17,8 @@ from utils import get_gis_context
 
 def location_map_retreiver(
     location: str = None,
+    state: str = None,
     radius: str = None,
-    specific_variables: List[str] = []
 ) -> str:
     '''
     The function is an example of a custom python function
@@ -41,8 +41,7 @@ def location_map_retreiver(
 
     '''
     data = {}
-
-    verbal_desc_map = get_block_group_map_with_opp_comp_score(location, radius, get_gis_context())  
+    verbal_desc_map = get_block_group_map_with_opp_comp_score(f"{location}, {state}", radius, get_gis_context())  
 
     # this function is a mockup, returns fake/hardcoded weather forecast data
     #data['utterance'] = 'location recommendation'
@@ -61,12 +60,6 @@ def location_map_retreiver(
     if not radius or radius == 'radius':
         data['radius'] = '5.0'
 
-    # if required variable names are not included in the data section,
-    # the attribute is added to the dictionary with value I don't know.
-    for variable_name in specific_variables:
-        if variable_name not in data.keys():
-            data[variable_name] = 'data not available'
-
 
     return json.dumps(data)
 
@@ -84,11 +77,11 @@ def location_recommendation(json_request: str) -> str:
 
     
     location = arguments.get('location', None)
+    state = arguments.get('state', None)
     # food_biz_type = arguments.get('food_biz_type', None)
     radius = arguments.get('radius', None)
-    specific_variables = arguments.get('specific_variables', [])
 
-    return location_map_retreiver(location, radius, specific_variables)
+    return location_map_retreiver(location, state, radius)
 
 
 #
@@ -97,8 +90,8 @@ def location_recommendation(json_request: str) -> str:
 # Note the "{{" and "}}": this double quotation is needed
 # to avoid a runt-time error triggered by the agent instatiation.
 #
-name = 'location_recommendation'
-request_format = '{{"location":"location","radius":"radius","specific_variables":["variable_name"]}}'
+name = 'business_location_recommendation'
+request_format = '{{"location":"location","state":"state","radius":"radius",}}'
 output_format = '{{"file_path":"file_path","verbal_desc":"verbal_desc","location":"location","radius":"radius"}}'
 
 ## We were getting the below error:

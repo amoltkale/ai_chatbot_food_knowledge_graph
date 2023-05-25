@@ -39,7 +39,7 @@ def nearest_sba(json_request: str) -> str:
 
 
 name = 'nearest_help_center'
-request_format = '{{"home_street_address":"home_street_address","home_zip":"home_zip","home_city":"home_city", "home_state":"home_state","contact_instruction":"contact_instruction"}}'
+request_format = '{{"home_street_address":"home_street_address","home_zip":"home_zip","home_city":"home_city", "home_state":"home_state"}}'
 output_format = '{{"nearest_facility":"facility_address","facility_name":"facility_name","organization_name":"organization_name","contact_number":"contact_number","distance":"distance_in_miles","specific_variables":["variable_name"]}}'
 
 description = f'''

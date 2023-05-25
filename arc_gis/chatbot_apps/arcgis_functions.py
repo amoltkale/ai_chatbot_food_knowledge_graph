@@ -149,7 +149,6 @@ def get_block_group_map_with_opp_comp_score(region, radius, gis):
     point_location = region_address[0]['location']
     # print(f"point_location: {point_location}")
     point_geom = Point({"x": point_location['x'], "y": point_location['y'], "spatialReference" : {'wkid': 4326, 'latestWkid': 4326}})
-
     ## This buffer query was failing because ESRI takes constant values instead of names for unit.
     # So here 9035 is Value for constant esriSRUnit_SurveyMile which is described as 'US Survey Mile'
     # Link for more constants: http://resources.arcgis.com/en/help/arcobjects-cpp/componenthelp/index.html#/esriSRUnitType_Constants/000w00000042000000/
