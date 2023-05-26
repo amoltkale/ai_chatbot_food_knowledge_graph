@@ -31,9 +31,7 @@ def setup_agent_chain():
     from sba_doc_index_tool import SBADocIndexTool
     from funding_doc_index_tool import FundingDocIndexTool
 
-    openaikey = get_config("open_ai","key")
     llm = get_default_openai_llm()
-
 
     tools = [
             # LoadRegistrant,
