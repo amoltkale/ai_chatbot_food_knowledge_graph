@@ -43,26 +43,8 @@ def setup_agent_chain():
             NearestSBATool,
             ]
 
-
-
-    # prefix = """Have a conversation with a human, answering the following questions as best you can. You have access to the following tools:"""
-    # suffix = """Begin!"
-
-    # {chat_history}
-    # Question: {input}
-    # {agent_scratchpad}"""
-
-    # prompt = ConversationalChatAgent.create_prompt(
-    #     tools, 
-    #     input_variables=["input", "chat_history", "agent_scratchpad"]
-    # )
-
-
     memory = ConversationBufferMemory(memory_key="chat_history")
 
-    #llm_chain = LLMChain(llm=llm, prompt=prompt)
-    # agent = ConversationalChatAgent(llm_chain=llm_chain, tools=tools, verbose=True)
-    #agent_chain = AgentExecutor.from_agent_and_tools(agent=agent, tools=tools, verbose=True, memory=memory)
     agent_chain = initialize_agent(tools, llm, agent=AgentType.CONVERSATIONAL_REACT_DESCRIPTION, verbose=True, memory=memory)
     return agent_chain
 
