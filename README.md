@@ -11,6 +11,10 @@ Each componenent is currently structured in its own directory. This allows the n
     * conversational_ai: code related to building, training, and interacting with the conversational ai
 
 ## Set up
+### Log ins
+1. `cp template_config.ini config.ini`
+2. Fill out details
+
 ### Python environment
 There are two different python versions currently being used. Arcgis requires python 3.9.x while everything else requires python 3.10.x.
 

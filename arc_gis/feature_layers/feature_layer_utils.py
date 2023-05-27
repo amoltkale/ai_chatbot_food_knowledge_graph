@@ -2,6 +2,30 @@ import arcgis
 from arcgis.gis import GIS
 from arcgis.features import *
 import pandas as pd
+from arcgis.geometry  import Geometry
+from arcgis.features.geo._array import GeoArray
+import json
+import sys
+sys.path.append('../')
+from utils import get_config, format_json
+
+def create_feature_layer(df, gis, final_columns, title, tags=[], num=None):
+    """
+    Shape column of input dataframe which is in strinh json format is comverted to geometry column.
+    And then the new transformed spatially enabled dataframe is created as a feature layer.
+    Returns a feature layer collection item.
+    """
+    if num is not None:
+        title = title + " " + str(num)
+    df = df[final_columns]
+    df["SHAPE"] = GeoArray([Geometry(json.loads(format_json(x))) for x in df['SHAPE']])
+    feature_layer = df.spatial.to_featurelayer(title=title,
+                                          gis=gis,
+                                          folder="nourish_gis",
+                                          tags=tags)
+    print(f"Number of fields published as part of this layer:",len(feature_layer.layers[0].properties['fields']))
+    display(feature_layer)
+    return feature_layer
 
 def delete_existing_folder(folder_name):
     try:
@@ -65,7 +89,7 @@ def get_enrichment_variables(nourish_enrichment_segment,exel_book='../resources/
     vars_df = vars_df.dropna(subset=['Variables to use'])
     var_list = list(vars_df['Variables to use'].unique())
     print(f"\tNumber of Variables: {len(var_list)}")
-    return var_list
+    return [x.lower() for x in var_list]
 
 
 def find_non_common_columns(fl_sdf_1,fl_sdf_2):
