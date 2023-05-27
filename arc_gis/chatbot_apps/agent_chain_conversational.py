@@ -7,6 +7,7 @@ from langchain.agents import ZeroShotAgent, Tool, AgentExecutor, ConversationalC
 from langchain.callbacks import get_openai_callback
 
 from load_registrant import get_welcome_prompt, set_enviro_email
+from neo4j_database import Neo4jDatabase
 
 # import to read configs
 sys.path.append('../../../../')
@@ -30,11 +31,14 @@ def setup_agent_chain():
     from nearest_sba_tool import NearestSBATool
     from sba_doc_index_tool import SBADocIndexTool
     from funding_doc_index_tool import FundingDocIndexTool
+    from neo4j_interface import FoodIRITool, RelatedFoodListTool
 
     llm = get_default_openai_llm()
 
     tools = [
             # LoadRegistrant,
+            FoodIRITool(db=Neo4jDatabase()),
+            RelatedFoodListTool(db=Neo4jDatabase()),
             LocationRecommendation,
             FundingDocIndexTool,
             SBADocIndexTool,

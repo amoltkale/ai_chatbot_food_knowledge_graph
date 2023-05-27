@@ -36,24 +36,60 @@ class BaseNeo4jDatabaseTool(BaseModel):
         arbitrary_types_allowed = True
         extra = Extra.forbid
 
-class CypherFullTextSearchQueryBaseTool(BaseNeo4jDatabaseTool,BaseTool):
-    """Tool to create the cypher query according to the questions asked."""
-    name = "cypher_full_text_search"
-    description = """
-    Input to this tool is instruction to do a full text search on food type, output is a cypher query with corerct syntax for neo4j dabase.
+class FoodIRITool(BaseNeo4jDatabaseTool, BaseTool):
+    """Tool to create the cypher query with fulltext index search to get Food IRI property"""
+    name = 'food_iri'
+    description = f'''
+    Helps to return the node iri property value and node label from the neo4j database .
+    Input should be a cypher query with food type as parameter as per example provided here.
+    Output would be the Food iri from the query execution post this as a question to give related food products.
 
     Example:
-    Given a food type = apple slice in the questions, the cypher query would be :
-    CALL db.index.fulltext.queryNodes("label_index", "apple slice") YIELD node, score RETURN node.iri, node.label, score
-    """
+    Here to get the node iri and the node label for food = apple slice, cypher query to be executed would be as below:
+    CALL db.index.fulltext.queryNodes("label_index", "apple slice") YIELD node, score RETURN node.iri as food_iri limit 1
+    '''
+    def _run(
+        self,
+        query: str,
+        run_manager: Optional[CallbackManagerForToolRun] = None,
+    ) -> str:
+        """Execute the query, return the results or an error message."""
+        return self.db.query_no_throw(query)
 
-class CypherGetRelatedNodesBaseTool(BaseNeo4jDatabaseTool,BaseTool):
-    """Tool to create the cypher query according to the questions asked."""
-    name = "cypher_get_related_nodes"
-    description = """
-    Input to this tool is instruction to use a food type, output is a cypher query with corerct syntax for neo4j dabase.
-    neo4j database, 
-    """
+    async def _arun(
+        self,
+        query: str,
+        run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
+    ) -> str:
+        raise NotImplementedError("QuerySqlDbTool does not support async")
+
+class RelatedFoodListTool(BaseNeo4jDatabaseTool, BaseTool):
+    """Tool to create the cypher query with fulltext index search to get Food IRI property"""
+    name = 'food_list'
+    description = f'''
+    Helps to return the connected food products give a food iri value .
+    Input should be a cypher query with iri as parameter as per example provided here.
+    Output would be list of related food products using is_a relationship as per the query execution.
+
+    Example Cypher Query:
+    Here to get the related food products with iri = "http://purl.obolibrary.org/obo/FOODON_00001009", cypher query to be executed would be as below:
+    MATCH p=(n:Concept)<-[r:is_a*..2]-(m) WHERE n.iri = "http://purl.obolibrary.org/obo/FOODON_00001009" return collect(n.label[0])[0] + collect(m.label[0]) as related_food_products_list
+    '''
+    def _run(
+        self,
+        query: str,
+        run_manager: Optional[CallbackManagerForToolRun] = None,
+    ) -> str:
+        """Execute the query, return the results or an error message."""
+        return self.db.query_no_throw(query)
+
+    async def _arun(
+        self,
+        query: str,
+        run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
+    ) -> str:
+        raise NotImplementedError("QuerySqlDbTool does not support async")
+
 
 class QueryNeo4jDataBaseTool(BaseNeo4jDatabaseTool,BaseTool):
     """Tool for querying a Neo4j database."""
@@ -137,7 +173,6 @@ class Neo4jDatabaseToolkit(BaseToolkit):
     def get_tools(self) -> List[BaseTool]:
         """Get the tools in the toolkit."""
         return [
-            CreateNeo4jDataBaseTool(db=self.db),
             QueryNeo4jDataBaseTool(db=self.db),
             #InfoNeo4jDatabaseTool(db=self.db),
             #ListNeo4jDatabaseTool(db=self.db),
