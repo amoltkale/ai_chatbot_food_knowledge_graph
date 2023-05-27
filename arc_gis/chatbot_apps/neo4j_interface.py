@@ -63,9 +63,9 @@ class FoodIRITool(BaseNeo4jDatabaseTool, BaseTool):
     ) -> str:
         raise NotImplementedError("QuerySqlDbTool does not support async")
 
-class RelatedFoodListTool(BaseNeo4jDatabaseTool, BaseTool):
+class RelatedFoodListFromIRITool(BaseNeo4jDatabaseTool, BaseTool):
     """Tool to create the cypher query with fulltext index search to get Food IRI property"""
-    name = 'food_list'
+    name = 'food_list_from_iri'
     description = f'''
     Helps to return the connected food products give a food iri value .
     Input should be a cypher query with iri as parameter as per example provided here.
@@ -82,6 +82,30 @@ class RelatedFoodListTool(BaseNeo4jDatabaseTool, BaseTool):
     ) -> str:
         """Execute the query, return the results or an error message."""
         return self.db.query_no_throw(query)
+
+    async def _arun(
+        self,
+        query: str,
+        run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
+    ) -> str:
+        raise NotImplementedError("QuerySqlDbTool does not support async")
+    
+class RelatedFoodListTool(BaseNeo4jDatabaseTool, BaseTool):
+    """Tool to create the cypher query to return the connected or alternative food products give a food type"""
+    name = 'food_list'
+    description = f'''
+    Helps to return the connected or alternative food products give a food type .
+    Input should be a food type to extract alternative of list of related foods.
+    Output would be list of related food products phrased in a way to show it is according to our analysis and database.
+    '''
+    def _run(
+        self,
+        food_type: str,
+        run_manager: Optional[CallbackManagerForToolRun] = None,
+    ) -> str:
+        """Execute the query created by using the food type, return the results or an error message."""
+        return self.db.get_food_list_related_to_food_type(food_type=food_type)
+
 
     async def _arun(
         self,
