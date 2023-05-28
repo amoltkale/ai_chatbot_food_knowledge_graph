@@ -1,13 +1,10 @@
 """Cypher Agent"""
 
 from typing import Any, Dict, List, Optional
-
 from pydantic import BaseModel, Extra, Field, root_validator
 
 from langchain.agents.agent import AgentExecutor
-#from langchain.agents.agent_toolkits.sql.prompt import SQL_PREFIX, SQL_SUFFIX
 from langchain.agents.mrkl.base import ZeroShotAgent
-#from langchain.agents.mrkl.prompt import FORMAT_INSTRUCTIONS
 from langchain.base_language import BaseLanguageModel
 from langchain.callbacks.base import BaseCallbackManager
 from langchain.chains.llm import LLMChain
@@ -17,11 +14,9 @@ from langchain.callbacks.manager import (
     AsyncCallbackManagerForToolRun,
     CallbackManagerForToolRun,
 )
-from langchain.chains import RetrievalQA
 
 from neo4j_database import Neo4jDatabase
 
-from pydantic import Field
 
 class BaseNeo4jDatabaseTool(BaseModel):
     """Base tool for interacting with a Neo4j database."""
@@ -61,7 +56,7 @@ class FoodIRITool(BaseNeo4jDatabaseTool, BaseTool):
         query: str,
         run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
     ) -> str:
-        raise NotImplementedError("QuerySqlDbTool does not support async")
+        raise NotImplementedError("FoodIRITool does not support async")
 
 class RelatedFoodListFromIRITool(BaseNeo4jDatabaseTool, BaseTool):
     """Tool to create the cypher query with fulltext index search to get Food IRI property"""
@@ -88,7 +83,7 @@ class RelatedFoodListFromIRITool(BaseNeo4jDatabaseTool, BaseTool):
         query: str,
         run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
     ) -> str:
-        raise NotImplementedError("QuerySqlDbTool does not support async")
+        raise NotImplementedError("RelatedFoodListFromIRITool does not support async")
     
 class RelatedFoodListTool(BaseNeo4jDatabaseTool, BaseTool):
     """Tool to create the cypher query to return the connected or alternative food products give a food type"""
@@ -112,7 +107,7 @@ class RelatedFoodListTool(BaseNeo4jDatabaseTool, BaseTool):
         query: str,
         run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
     ) -> str:
-        raise NotImplementedError("QuerySqlDbTool does not support async")
+        raise NotImplementedError("RelatedFoodListTool does not support async")
 
 
 class QueryNeo4jDataBaseTool(BaseNeo4jDatabaseTool,BaseTool):
@@ -138,7 +133,7 @@ class QueryNeo4jDataBaseTool(BaseNeo4jDatabaseTool,BaseTool):
         query: str,
         run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
     ) -> str:
-        raise NotImplementedError("QuerySqlDbTool does not support async")
+        raise NotImplementedError("QueryNeo4jDataBaseTool does not support async")
 
 class InfoNeo4jDatabaseTool(BaseNeo4jDatabaseTool, BaseTool):
     """Tool for getting metadata about a Neo4j database."""
