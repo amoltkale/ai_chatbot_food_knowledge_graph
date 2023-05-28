@@ -17,8 +17,13 @@ Updating Neo4j:
 '''
 def initialize_annots(onto):
     annot_set = set()
-    for c in onto.classes():
-        annot_set = annot_set | get_annots(c)
+    try:
+        for c in onto.classes():
+            annot_set = annot_set | get_annots(c)
+    except TypeError as e:
+        print(c)
+        print(c.iri)
+        raise e
 
     annot_dict = {a: None for a in annot_set}
     return annot_dict

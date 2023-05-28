@@ -1,10 +1,12 @@
+import argparse
 from pathlib import Path
 
-import argparse
+from owlready2 import *
 
-from owlready2 import get_ontology
+import pandas as pd
 
-from onto_lib.utils import parse_ontology, create_csvs
+from onto_lib.onto_classes import *
+from onto_lib.utils import create_csvs
 
 def parse_args():
     #TODO add verbose flag and node prefix
@@ -12,38 +14,45 @@ def parse_args():
     parser.add_argument('--in_path', type=Path, help="path to ontology file")
     return parser.parse_args()
 
+def convert_owl(in_p:Path, out_p:Path):
+    path_dict = {"node":    out_p / f"{in_p.stem}_nodes.csv",
+                "rel":     out_p / f"{in_p.stem}_rels.csv",
+                }
+    # load ontologies
+    onto = get_ontology(str(in_p)).load()
+    annot_dict = initialize_annots(onto)
+    create_csvs(path_dict, annot_list=list(annot_dict.keys()))
+
+    g = create_graph(onto, path_dict)
+
+    # verify no dups for nodes
+    class_node_df = pd.read_csv(path_dict["node"])
+    print(f"Node shape before: {class_node_df.shape[0]}")
+    print(f"Node shape after: {class_node_df.drop_duplicates().shape[0]}")
+
+    # verify no dups for rels
+    class_rel_df = pd.read_csv(path_dict["rel"])
+    print(f"Rels shape before: {class_rel_df.shape[0]}")
+    print(f"Rels shape after: {class_rel_df.drop_duplicates().shape[0]}")
+
 def main():
     '''
     path_dict: 3 paths: node, rel, err
     '''
     args = parse_args()
 
-    # validate path is valid
-    assert args.in_path.is_file(), f"invalid path {args.in_path}"
-
     # create out path and other resulting paths
     out_p = args.in_path.parent / "out"
     out_p.mkdir(exist_ok=True)
 
-    path_dict = {"node":    out_p / "nodes.csv",
-                 "rel":     out_p / "rels.csv",
-                 "err":     out_p / "error_log.csv",
-                 "pattern_csv": out_p / "rest_detail_pattern.csv",
-                 "pattern_json": out_p / "pattern_index.json",
-                 "annot": out_p / "annot.csv",
-                #  "pattern": out_p / "pattern.csv"
-                 }
-
-    # create csvs for neo4j
-    create_csvs(path_dict)
-
-    # load ontology
-    # must cast as str since get_ontology throws error
-    # AttributeError: 'PosixPath' object has no attribute 'endswith'
-    onto = get_ontology(str(args.in_path)).load()
-
-    # parse ontology
-    parse_ontology(path_dict, onto, node_prefix="upper")
+    # validate path is valid
+    if args.in_path.is_dir():
+        # pass
+        for owl_p in args.in_path.glob('*.owl'):
+            convert_owl(owl_p, out_p)
+    elif args.in_path.is_file():
+        assert args.in_path.suffix == ".owl", f"Must be an owl file, given {args.in_path.suffix} file"
+        convert_owl(args.in_path, out_p)
 
 if __name__ == "__main__":
     main()
