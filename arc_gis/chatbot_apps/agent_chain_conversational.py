@@ -46,7 +46,7 @@ def setup_agent_chain():
             ]
 
     memory = ConversationBufferMemory(memory_key="chat_history")
-    memory.save_context({"welcome_prompt":get_welcome_prompt()},{"output":""})
+    # memory.save_context({"welcome_prompt":get_welcome_prompt()},{"output":""})
     
 
     agent_chain = initialize_agent(tools, llm, agent=AgentType.CONVERSATIONAL_REACT_DESCRIPTION, verbose=True, memory=memory)
