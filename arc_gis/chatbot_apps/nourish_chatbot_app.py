@@ -66,13 +66,18 @@ app = dash.Dash(name = __name__, server = server)
 app.css.append_css({"external_url": "https://codepen.io/chriddyp/pen/bWLwgP.css"})
 
 # init a list of the sessions conversation history
-conv_hist = [html.H5(html.I(intial_response), style={'text-align': 'left'})] + [html.Hr()]
+#conv_hist = [html.H5(html.I(intial_response), style={'text-align': 'left'})] + [html.Hr()]
+conv_hist = [html.Hr()] + [html.H5(html.I(intial_response), style={'text-align': 'left'})] + [html.Hr()]
 
 # credit to initial UI: https://github.com/AdamSpannbauer/app_rasa_chat_bot/blob/master/dash_demo_app.py
 
 # app ui
 app.layout = html.Div([
-    html.H3('Nourish Chatbot', style={'text-align': 'center'}),
+    html.Div([
+        html.Img(src='static/nourish_logo.png', height="100px", width="100px"),
+    ], style={'width': '49%', 'display': 'inline-block', 'padding': '0 20', 'align': 'right'}),
+     
+    html.H3('Nourish Chatbot',style={'text-align': 'center'}),
     html.H4('Please answer all questions as accurately as possible. If you are unsure, please ask the bot to try again.',
             style={'text-align': 'center'}),
     html.Div([
