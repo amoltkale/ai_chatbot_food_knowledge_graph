@@ -20,6 +20,7 @@ sys.path.append('../../')
 from utils import get_config
 
 from load_registrant import get_welcome_prompt, set_enviro_email
+from neo4j_database import Neo4jDatabase
 
 def parse_args():
     parser = argparse.ArgumentParser(description = 'Grab some variables about how to run the app')
@@ -46,7 +47,8 @@ if not args.ui_dev:
     # Get AI key
     os.environ['OPENAI_API_KEY'] = ai_key
 
-    agent_chain = setup_agent_chain()
+    db:Neo4jDatabase = Neo4jDatabase()
+    agent_chain = setup_agent_chain(db)
 
     # intial_response = "Hello"
     with get_openai_callback() as cb:

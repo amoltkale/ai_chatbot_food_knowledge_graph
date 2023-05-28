@@ -23,7 +23,7 @@ def parse_args():
                         help="Directly ask agent chain a question")
     return parser.parse_args()
 
-def setup_agent_chain():
+def setup_agent_chain(db:Neo4jDatabase):
     # from tools_agent import agent
     from location_recommendation_tool import LocationRecommendation
     from load_registrant_tool import LoadRegistrant
@@ -32,17 +32,19 @@ def setup_agent_chain():
     from sba_doc_index_tool import SBADocIndexTool
     from funding_doc_index_tool import FundingDocIndexTool
     from neo4j_interface import FoodIRITool, RelatedFoodListTool
+    from nearest_sba_tool_enhanced import NearestSBAToolEnhanced
 
     llm = get_default_openai_llm()
 
     tools = [
             # LoadRegistrant,
-            FoodIRITool(db=Neo4jDatabase()),
-            RelatedFoodListTool(db=Neo4jDatabase()),
             LocationRecommendation,
             FundingDocIndexTool,
             SBADocIndexTool,
-            NearestSBATool,
+            #NearestSBATool,
+            NearestSBAToolEnhanced,
+            FoodIRITool(db=Neo4jDatabase()),
+            RelatedFoodListTool(db=Neo4jDatabase()),
             ]
 
     memory = ConversationBufferMemory(memory_key="chat_history")
@@ -56,8 +58,8 @@ if __name__ == '__main__':
     # Set email for chat
     args = parse_args()
     set_enviro_email(args.email)
-
-    agent_chain = setup_agent_chain()
+    db:Neo4jDatabase = Neo4jDatabase()
+    agent_chain = setup_agent_chain(db)
 
     chat_history = get_welcome_prompt()
     with get_openai_callback() as cb:
@@ -78,6 +80,7 @@ if __name__ == '__main__':
         while True:
             question = input("Question: ")
             if question == 'bye':
+                db.close_session()
                 break
             print_in_color(f"Question: {question}", bcolors.YELLOW)
             with get_openai_callback() as cb:
@@ -88,4 +91,5 @@ if __name__ == '__main__':
             
     print_in_color(f"Chat history from memory:\n {agent_chain.memory.buffer}", bcolors.AMBER)
 else:
-    agent_chain = setup_agent_chain()
+    db:Neo4jDatabase = Neo4jDatabase()
+    agent_chain = setup_agent_chain(db)
