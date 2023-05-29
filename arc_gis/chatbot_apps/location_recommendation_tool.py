@@ -100,7 +100,6 @@ description = f'''
 Helps to identify the intent of the question.
 Input must be valid JSON in the following format with double quotes: {request_format}
 In the input format, do not add units for radius. Just keep a float value such as 5.0.
-Supply "specific_variables" list just if you really need them.
 If don't know the value to be assigned to a key, omit the key.
 Output must be valid JSON in the following format: {output_format}. 
 In the output format, do not add units.

@@ -49,7 +49,9 @@ class FoodIRITool(BaseNeo4jDatabaseTool, BaseTool):
         run_manager: Optional[CallbackManagerForToolRun] = None,
     ) -> str:
         """Execute the query, return the results or an error message."""
-        return self.db.query_no_throw(query)
+        result = self.db.query_no_throw(query)
+        self.db.close_session()
+        return result
 
     async def _arun(
         self,
@@ -76,7 +78,9 @@ class RelatedFoodListFromIRITool(BaseNeo4jDatabaseTool, BaseTool):
         run_manager: Optional[CallbackManagerForToolRun] = None,
     ) -> str:
         """Execute the query, return the results or an error message."""
-        return self.db.query_no_throw(query)
+        result = self.db.query_no_throw(query)
+        self.db.close_session()
+        return result
 
     async def _arun(
         self,
@@ -99,8 +103,9 @@ class RelatedFoodListTool(BaseNeo4jDatabaseTool, BaseTool):
         run_manager: Optional[CallbackManagerForToolRun] = None,
     ) -> str:
         """Execute the query created by using the food type, return the results or an error message."""
-        return self.db.get_food_list_related_to_food_type(food_type=food_type)
-
+        result = self.db.get_food_list_related_to_food_type(food_type=food_type)
+        self.db.close_session()
+        return result
 
     async def _arun(
         self,

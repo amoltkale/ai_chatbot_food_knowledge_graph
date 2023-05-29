@@ -30,6 +30,13 @@ def set_enviro_email(email:str):
 def get_email() -> str:
     return os.environ["USEREMAIL"]
 
+def get_registrant_list_from_db():
+    qry = """SELECT id, first_name, last_name, email FROM registrants;
+        """
+    conn = server_connect()
+    obs = run_qry(conn, qry)
+    return obs
+
 def get_welcome_prompt():
     email=get_email()
     conn = server_connect()
@@ -184,3 +191,21 @@ def run_qry(conn, query_str):
     cur.close()
 
     return obs
+
+def user_menu():
+    user_id_email_dict = {}
+    print("Choose the user ID for a chat session demo !!")
+    for item in get_registrant_list_from_db():
+        print(f"{item[0]} for chat demo session of user: {item[1]} {item[2]}")
+        user_id_email_dict[item[0]] = item[3]
+
+    #print(user_id_email_dict)
+    choice = int(input("Input the User ID: "))
+    email = user_id_email_dict[choice]
+    # Removes the square brackets
+    p_email = str(email)[1:-1].replace("'", "")
+    #print(f"User Selected: {p_email}")
+    return p_email
+
+if __name__ == '__main__':
+    user_menu()

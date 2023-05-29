@@ -6,7 +6,7 @@ from langchain.memory import ConversationBufferMemory, ReadOnlySharedMemory
 from langchain.agents import ZeroShotAgent, Tool, AgentExecutor, ConversationalChatAgent, AgentType, initialize_agent
 from langchain.callbacks import get_openai_callback
 
-from load_registrant import get_welcome_prompt, set_enviro_email
+from load_registrant import get_welcome_prompt, set_enviro_email, user_menu
 from neo4j_database import Neo4jDatabase
 
 # import to read configs
@@ -43,8 +43,8 @@ def setup_agent_chain(db:Neo4jDatabase):
             SBADocIndexTool,
             #NearestSBATool,
             NearestSBAToolEnhanced,
-            FoodIRITool(db=Neo4jDatabase()),
-            RelatedFoodListTool(db=Neo4jDatabase()),
+            FoodIRITool(db=db),
+            RelatedFoodListTool(db=db),
             ]
 
     memory = ConversationBufferMemory(memory_key="chat_history")
@@ -57,7 +57,9 @@ def setup_agent_chain(db:Neo4jDatabase):
 if __name__ == '__main__':
     # Set email for chat
     args = parse_args()
-    set_enviro_email(args.email)
+    #set_enviro_email(args.email)
+    
+    set_enviro_email(user_menu())
     db:Neo4jDatabase = Neo4jDatabase()
     agent_chain = setup_agent_chain(db)
 
