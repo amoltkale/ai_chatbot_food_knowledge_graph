@@ -59,8 +59,8 @@ def server_connect():
     nourish_user = get_config("nourish_db","username")
     nourish_pswd = get_config("nourish_db","passkey")
     conn = psycopg2.connect(
-        host="awesome-hw.sdsc.edu",
-        database="nourish",
+        host=get_config("nourish_db","host"),
+        database=get_config("nourish_db","db"),
         user=nourish_user,
         password=nourish_pswd)
     return conn
