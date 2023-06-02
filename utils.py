@@ -2,10 +2,10 @@ import configparser
 import os
 
 import psycopg2
-
+from langchain import SQLDatabase
+from urllib.parse import quote
 from arcgis.gis import GIS
 
-import pandas as pd
 
 
 class bcolors:
@@ -83,3 +83,12 @@ def execute_sql(conn, qry):
     cur.close()
     
     return res
+
+def get_postgres_db_obj():
+    # Creating Postgres SQL DB
+    username = get_config("nourish_db","username")
+    password = get_config("nourish_db","passkey")
+    host = get_config("nourish_db","host")
+    sql_db_name = get_config("nourish_db","db")
+    sql_db = SQLDatabase.from_uri(f"postgresql://{username}:%s@{host}/{sql_db_name}" % quote(password))
+    return sql_db
