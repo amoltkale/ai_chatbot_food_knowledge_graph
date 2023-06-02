@@ -108,7 +108,9 @@ app.layout = html.Div([
                     id="loading-1",
                     type="default",
                     children=html.Div([
-                    dcc.Input(id='msg_input', value='', type='text',style={'width':'925px'}),
+                    dcc.Input(id='msg_input', 
+                              value='', type='text', spellCheck=True, debounce=True,
+                              style={'width':'925px'}),
                     html.Button('>>>', id='send_button', type='submit',style={'width':'60px'})
                     ],)
                     ),
@@ -120,35 +122,35 @@ app.layout = html.Div([
     Output("msg_input", "value"),
     Output("conversation", "children"),
     Input("send_button", "n_clicks"),
+    Input('msg_input', 'n_submit'),
     State('msg_input', 'value'),
 )
 # function to add new user*bot interaction to conversation history
-def update_conversation(click, text):
+def update_conversation(click, enter_press, text):
     global conv_hist
 
-    if click is None:
+    if (click == None and enter_press == None) or text == "":
+        # dont do anything if text is empty
         return "", conv_hist
-    if click > 0:
-        # call bot with user inputted text
 
-        if not args.ui_dev:
-            with get_openai_callback() as cb:
-                agent_response = agent_chain.run(text)
-                print(f"Total Tokens: {cb.total_tokens}")
-                print(f"Prompt Tokens: {cb.prompt_tokens}")
-                print(f"Completion Tokens: {cb.completion_tokens}")
-                print(f"Total Cost (USD): ${cb.total_cost}")
-            try:
-                output_json = json.loads(agent_response)
-                if 'file_path' in output_json:
-                    additional_text = [dcc.Markdown(output_json['verbal_desc'], style=response_style)]
-                    rspd =  [html.Iframe(src=output_json['file_path'], height="400px", width="1000px")] + additional_text
-                else:
-                    rspd = [dcc.Markdown(output_json['response'], style=response_style)]
-            except:
-                rspd = [dcc.Markdown(agent_response, style=response_style)]
-        else:
-            rspd = [dcc.Markdown("""
+    if not args.ui_dev:
+        with get_openai_callback() as cb:
+            agent_response = agent_chain.run(text)
+            print(f"Total Tokens: {cb.total_tokens}")
+            print(f"Prompt Tokens: {cb.prompt_tokens}")
+            print(f"Completion Tokens: {cb.completion_tokens}")
+            print(f"Total Cost (USD): ${cb.total_cost}")
+        try:
+            output_json = json.loads(agent_response)
+            if 'file_path' in output_json:
+                additional_text = [dcc.Markdown(output_json['verbal_desc'], style=response_style)]
+                rspd =  [html.Iframe(src=output_json['file_path'], height="400px", width="1000px")] + additional_text
+            else:
+                rspd = [dcc.Markdown(output_json['response'], style=response_style)]
+        except:
+            rspd = [dcc.Markdown(agent_response, style=response_style)]
+    else:
+        rspd = [dcc.Markdown("""
 You are still in ui dev. Restart app with ui_dev flag set to false to run agent.  
 Currently Available parameters are the following:  
 ------
@@ -161,17 +163,13 @@ python nourish_chatbot_app.py --ui_dev True
 ```  
 """, style=response_style)]
 
+    # user message aligned left
+    rcvd = [html.H5(html.B(text), style=recieved_style)]
 
-        # user message aligned left
-        rcvd = [html.H5(html.B(text), style=recieved_style)]
-        
+    # append interaction to conversation history
+    conv_hist = conv_hist + rcvd + rspd + [html.Hr()]
 
-        # append interaction to conversation history
-        conv_hist = conv_hist + rcvd + rspd + [html.Hr()]
-
-        return "", conv_hist
-    else:
-        return "", ""
+    return "", conv_hist
 
 # Embed html
 @app.server.route('/static/<resource>')
@@ -182,5 +180,5 @@ def serve_static(resource):
 # run app
 if __name__ == '__main__':
     #webbrowser.open('http://127.0.0.1:8050/', new=0, autoraise=True) 
-    app.run_server(debug=True, use_reloader=False)
+    app.run_server(debug=True)
     # app.run_server()
