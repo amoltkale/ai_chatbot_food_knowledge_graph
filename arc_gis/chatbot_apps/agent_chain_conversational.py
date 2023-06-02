@@ -1,10 +1,11 @@
 import sys
 import argparse
-
+from urllib.parse import quote
 from langchain import OpenAI, ConversationChain, LLMChain, PromptTemplate
 from langchain.memory import ConversationBufferMemory, ReadOnlySharedMemory
 from langchain.agents import ZeroShotAgent, Tool, AgentExecutor, ConversationalChatAgent, AgentType, initialize_agent
 from langchain.callbacks import get_openai_callback
+from langchain import OpenAI, SQLDatabase
 
 from load_registrant import get_welcome_prompt, set_enviro_email, user_menu
 from neo4j_database import Neo4jDatabase
@@ -23,7 +24,7 @@ def parse_args():
                         help="Directly ask agent chain a question")
     return parser.parse_args()
 
-def setup_agent_chain(db:Neo4jDatabase):
+def setup_agent_chain(neo4j_db:Neo4jDatabase, sql_db:SQLDatabase):
     # from tools_agent import agent
     from location_recommendation_tool import LocationRecommendation
     from load_registrant_tool import LoadRegistrant
@@ -31,8 +32,9 @@ def setup_agent_chain(db:Neo4jDatabase):
     from nearest_sba_tool import NearestSBATool
     from sba_doc_index_tool import SBADocIndexTool
     from funding_doc_index_tool import FundingDocIndexTool
-    from neo4j_interface import FoodIRITool, RelatedFoodListTool
+    from neo4j_interface import FoodIRITool, RelatedFoodListTool, RelatedFoodIRIListTool
     from nearest_sba_tool_enhanced import NearestSBAToolEnhanced
+    from postgres_interface import HealthyAndUnheathyFoodTool
 
     llm = get_default_openai_llm()
 
@@ -43,8 +45,10 @@ def setup_agent_chain(db:Neo4jDatabase):
             SBADocIndexTool,
             #NearestSBATool,
             NearestSBAToolEnhanced,
-            FoodIRITool(db=db),
-            RelatedFoodListTool(db=db),
+            #FoodIRITool(db=neo4j_db),
+            #RelatedFoodListTool(db=neo4j_db),
+            RelatedFoodIRIListTool(db=neo4j_db),
+            HealthyAndUnheathyFoodTool(db=sql_db)
             ]
 
     memory = ConversationBufferMemory(memory_key="chat_history")
@@ -57,11 +61,18 @@ def setup_agent_chain(db:Neo4jDatabase):
 if __name__ == '__main__':
     # Set email for chat
     args = parse_args()
-    #set_enviro_email(args.email)
+    set_enviro_email(args.email)
     
-    set_enviro_email(user_menu())
+    #set_enviro_email(user_menu())
     db:Neo4jDatabase = Neo4jDatabase()
-    agent_chain = setup_agent_chain(db)
+
+    # Creating Postgres SQL DB
+    username = get_config("nourish_db","username")
+    password = get_config("nourish_db","passkey")
+    host = get_config("nourish_db","host")
+    sql_db_name = get_config("nourish_db","db")
+    sql_db = SQLDatabase.from_uri(f"postgresql://{username}:%s@{host}/{sql_db_name}" % quote(password))
+    agent_chain = setup_agent_chain(neo4j_db=db, sql_db=sql_db)
 
     chat_history = get_welcome_prompt()
     with get_openai_callback() as cb:
@@ -92,6 +103,3 @@ if __name__ == '__main__':
             #print_in_color(f"MEMEORY STORED: {agent_chain.memory.buffer}", bcolors.PURPLE)
             
     print_in_color(f"Chat history from memory:\n {agent_chain.memory.buffer}", bcolors.AMBER)
-else:
-    db:Neo4jDatabase = Neo4jDatabase()
-    agent_chain = setup_agent_chain(db)

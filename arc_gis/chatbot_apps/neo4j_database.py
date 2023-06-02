@@ -41,16 +41,6 @@ class Neo4jDatabase:
             print(f"Error: {e}")
             return "Sorry, something went wrong, I cannot get the informationa asked"
 
-    def get_food_list_related_to_food_type(self, food_type):
-        cypher_qyery = f"""CALL db.index.fulltext.queryNodes("label_index", "{food_type}") YIELD node, score
-        WITH node.iri AS n, round(score, 4) AS s
-        ORDER BY s DESC
-        WITH s AS score, COUNT(s) AS score_count, collect(n) AS node_list
-        MATCH p=(n:Concept)<-[r:is_a*..4]-(m)
-        WHERE n.iri IN (node_list)
-        RETURN COLLECT(n.label[0])[0] + COLLECT(m.label[0]) AS food_list, score LIMIT 1"""
-        return self.query_no_throw(cypher_qyery)
-
 if __name__ == "__main__":
     SDSC_DB = 'San Diego Super Computer Neo4j DB'
     LOCAL_DB = 'Localhost Neo4j DB'
