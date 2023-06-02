@@ -88,35 +88,35 @@ conv_hist = [html.Hr()] + [html.H5(html.I(intial_response), style=response_style
 
 # app ui
 app.layout = html.Div([
-    html.Div([
-        html.Img(src='static/nourish_logo.png', height="100px", width="100px"),
-    ], style={'width': '49%', 'display': 'inline-block', 'padding': '0 20', 'align': 'right'}),
-     
-    html.H3('Nourish Chatbot',style={'text-align': 'center'}),
-    html.H4('Please answer all questions as accurately as possible. If you are unsure, please ask the bot to try again.',
-            style={'text-align':'center'}),
-    html.Div([
-        html.Div(id='conversation'),
-        html.Br(),
-        dcc.Loading(
-                    id="loading-1",
-                    type="default",
-                    children=html.Div([
-                    html.Table([
-                        html.Tr([
-                            # text input for user message
-                            html.Td([dcc.Input(id='msg_input', value='', type='text')],
-                                    style={'valign': 'middle'}),
-                            # message to send user message to bot backend
-                            html.Td([html.Button('Send', id='send_button', type='submit')],
-                                    style={'valign': 'middle'})
-                        ])
-                    ])],
-                    style={'width': '325px', 'margin': '0 auto'})
-                    ),
-        ],
-        id='screen',
-        style={'width': '1000px', 'margin': '0 auto'})
+    html.Img(src='static/nourish_logo.png', height="100px", width="100px"),
+        html.H3('Nourish Chatbot',style={'text-align': 'center'}),
+        html.H4('Please answer all questions as accurately as possible. If you are unsure, please ask the bot to try again.',
+                style={'text-align':'center'}),
+        html.Div([
+            html.Div(id='conversation'),
+            # html.Br(),
+            # dcc.Loading(
+            #             id="loading-1",
+            #             type="default",
+            #             children=html.Div([
+            #             dcc.Input(id='msg_input', value='', type='text',style={'width':'925px'}),
+            #             html.Button('>', id='send_button', type='submit',style={'width':'40px'})
+            #             ],)
+            #             ),
+            ],
+            id='screen',
+            style={'width': '1000px', 'margin': '0 auto'}),
+        html.Div([
+            html.Br(),
+            dcc.Loading(
+                        id="loading-1",
+                        type="default",
+                        children=html.Div([
+                        dcc.Input(id='msg_input', value='', type='text',style={'width':'925px'}),
+                        html.Button('>', id='send_button', type='submit',style={'width':'40px'})
+                        ],)
+                        ),
+        ], style={'width': '1000px', 'margin': '0 auto'}),
 ])
 
 # trigger bot response to user inputted message on submit button click
@@ -152,9 +152,18 @@ def update_conversation(click, text):
             except:
                 rspd = [html.H5(html.I(agent_response), style=response_style)]
         else:
-            rspd = [html.H5(html.I(
-                "You are still in ui dev. Restart app with ui_dev flag set to false to run agent."),
-                style=response_style)]
+            rspd = [dcc.Markdown("""
+You are still in ui dev. Restart app with ui_dev flag set to false to run agent.  
+Currently Available parameters are the following:  
+------
+* --email: email of desired user. default = m.hernandez@gmail.com
+* --ui_dev: Boolean flag to control ui dev  
+------
+Example run:  
+```py
+python nourish_chatbot_app.py --ui_dev True
+```  
+""", style=response_style)]
 
 
         # user message aligned left
