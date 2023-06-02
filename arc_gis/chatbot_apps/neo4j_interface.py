@@ -50,7 +50,6 @@ class FoodIRITool(BaseNeo4jDatabaseTool, BaseTool):
     ) -> str:
         """Execute the query, return the results or an error message."""
         result = self.db.query_no_throw(query)
-        self.db.close_session()
         return result
 
     async def _arun(
@@ -79,7 +78,6 @@ class RelatedFoodListFromIRITool(BaseNeo4jDatabaseTool, BaseTool):
     ) -> str:
         """Execute the query, return the results or an error message."""
         result = self.db.query_no_throw(query)
-        self.db.close_session()
         return result
 
     async def _arun(
@@ -103,8 +101,48 @@ class RelatedFoodListTool(BaseNeo4jDatabaseTool, BaseTool):
         run_manager: Optional[CallbackManagerForToolRun] = None,
     ) -> str:
         """Execute the query created by using the food type, return the results or an error message."""
-        result = self.db.get_food_list_related_to_food_type(food_type=food_type)
-        self.db.close_session()
+        cypher_qyery = f"""CALL db.index.fulltext.queryNodes("label_index", "{food_type}") YIELD node, score
+            WITH node.iri AS n, round(score, 4) AS s
+            ORDER BY s DESC
+            WITH s AS score, COUNT(s) AS score_count, collect(n) AS node_list
+            MATCH p=(n:Concept)<-[r:is_a*..4]-(m)
+            WHERE n.iri IN (node_list)
+            RETURN COLLECT(n.label[0])[0] + COLLECT(m.label[0]) AS food_list, score LIMIT 1"""
+        result = self.db.query_no_throw(cypher_qyery)
+        return result
+
+    async def _arun(
+        self,
+        query: str,
+        run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
+    ) -> str:
+        raise NotImplementedError("RelatedFoodListTool does not support async")
+    
+class RelatedFoodIRIListTool(BaseNeo4jDatabaseTool, BaseTool):
+    """Tool to create the cypher query to return the connected or alternative food products give a food type"""
+    name = 'related_food_iri_name_list'
+    description = f'''
+    Input should be a food type.
+    Output would be a python list of food ontolgy iri names.
+    '''
+    return_direct = False
+    def _run(
+        self,
+        food_type: str,
+        run_manager: Optional[CallbackManagerForToolRun] = None,
+    ) -> str:
+        """Execute the query created by using the food type, return the results or an error message."""
+        cypher_qyery = f"""CALL db.index.fulltext.queryNodes("label_index", "{food_type}") YIELD node, score
+                            WITH node.iri AS n, round(score, 4) AS s
+                            ORDER BY s DESC
+                            WITH s AS score, COUNT(s) AS score_count, collect(n) AS node_list
+                            MATCH p=(n:Concept)-[r:is_a*..2]-(m:Concept)
+                            WHERE n.iri IN (node_list)
+                            WITH COLLECT(split(n.node_id, ".")[-1])[0] + COLLECT(split(m.node_id, ".")[-1]) AS related_list, score LIMIT 1
+                            UNWIND related_list as related
+                            RETURN collect(DISTINCT related)"""
+        result = self.db.query_no_throw(cypher_qyery)
+        print(result)
         return result
 
     async def _arun(

@@ -1,18 +1,17 @@
 import sys
 import argparse
-from urllib.parse import quote
 from langchain import OpenAI, ConversationChain, LLMChain, PromptTemplate
 from langchain.memory import ConversationBufferMemory, ReadOnlySharedMemory
 from langchain.agents import ZeroShotAgent, Tool, AgentExecutor, ConversationalChatAgent, AgentType, initialize_agent
 from langchain.callbacks import get_openai_callback
-from langchain import OpenAI, SQLDatabase
+from langchain import SQLDatabase
 
 from load_registrant import get_welcome_prompt, set_enviro_email, user_menu
 from neo4j_database import Neo4jDatabase
 
 # import to read configs
 sys.path.append('../../../../')
-from utils import get_config, bcolors, print_in_color
+from utils import get_config, bcolors, print_in_color, get_postgres_db_obj
 
 from llm_utils import get_gpt_4_openai_llm, get_default_openai_llm
 
@@ -67,12 +66,7 @@ if __name__ == '__main__':
     db:Neo4jDatabase = Neo4jDatabase()
 
     # Creating Postgres SQL DB
-    username = get_config("nourish_db","username")
-    password = get_config("nourish_db","passkey")
-    host = get_config("nourish_db","host")
-    sql_db_name = get_config("nourish_db","db")
-    sql_db = SQLDatabase.from_uri(f"postgresql://{username}:%s@{host}/{sql_db_name}" % quote(password))
-    agent_chain = setup_agent_chain(neo4j_db=db, sql_db=sql_db)
+    sql_db = get_postgres_db_obj()
 
     chat_history = get_welcome_prompt()
     with get_openai_callback() as cb:

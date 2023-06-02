@@ -17,7 +17,7 @@ from langchain.callbacks import get_openai_callback
 
 # import to read configs
 sys.path.append('../../')
-from utils import get_config
+from utils import get_config, get_postgres_db_obj
 
 from load_registrant import get_welcome_prompt, set_enviro_email
 
@@ -61,7 +61,11 @@ if not args.ui_dev:
     set_enviro_email(args.email)
 
     db:Neo4jDatabase = Neo4jDatabase()
-    agent_chain = setup_agent_chain(db)
+
+    # Creating Postgres SQL DB
+    sql_db = get_postgres_db_obj()
+
+    agent_chain = setup_agent_chain(neo4j_db=db,sql_db=sql_db)
 
     # intial_response = "Hello"
     with get_openai_callback() as cb:
@@ -150,7 +154,7 @@ def update_conversation(click, text):
                 else:
                     rspd = [html.H5(html.I(output_json['response']), style=response_style)]
             except:
-                rspd = [html.H5(html.I(agent_response), style=response_style)]
+                rspd = [dcc.Markdown(agent_response, style=response_style)]
         else:
             rspd = [dcc.Markdown("""
 You are still in ui dev. Restart app with ui_dev flag set to false to run agent.  
