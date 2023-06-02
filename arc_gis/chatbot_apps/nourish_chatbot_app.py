@@ -20,7 +20,17 @@ sys.path.append('../../')
 from utils import get_config
 
 from load_registrant import get_welcome_prompt, set_enviro_email
-from neo4j_database import Neo4jDatabase
+
+# set up response style
+recieved_style={
+    'text-align':'right',
+    'color':'white',}
+
+response_style={
+    'text-align':'left',
+    # 'color':'rgb(80,36,97)',
+    # 'backgroundColor':'rgb(100, 100, 100)'
+    }
 
 def parse_args():
     parser = argparse.ArgumentParser(description = 'Grab some variables about how to run the app')
@@ -32,20 +42,23 @@ def parse_args():
 
 # Pull params and set environment variable
 args = parse_args()
-set_enviro_email(args.email)
-
-# Set up agent chains
-from agent_chain_conversational import setup_agent_chain
 
 # https://community.plotly.com/t/how-can-i-use-my-html-file-in-dash/7740/2
 STATIC_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
 
 if not args.ui_dev:
+    # Set up agent chains
+    from agent_chain_conversational import setup_agent_chain
+    from neo4j_database import Neo4jDatabase
+
     # Prepare openai
     ai_key = get_config("open_ai","key")
 
     # Get AI key
     os.environ['OPENAI_API_KEY'] = ai_key
+
+    # Establish user email
+    set_enviro_email(args.email)
 
     db:Neo4jDatabase = Neo4jDatabase()
     agent_chain = setup_agent_chain(db)
@@ -65,11 +78,11 @@ else:
 # Flask app 
 server = Flask(__name__)
 app = dash.Dash(name = __name__, server = server)
-app.css.append_css({"external_url": "https://codepen.io/chriddyp/pen/bWLwgP.css"})
+# app.css.append_css({"external_url": "https://codepen.io/chriddyp/pen/bWLwgP.css"})
 
 # init a list of the sessions conversation history
 #conv_hist = [html.H5(html.I(intial_response), style={'text-align': 'left'})] + [html.Hr()]
-conv_hist = [html.Hr()] + [html.H5(html.I(intial_response), style={'text-align': 'left'})] + [html.Hr()]
+conv_hist = [html.Hr()] + [html.H5(html.I(intial_response), style=response_style)] + [html.Hr()]
 
 # credit to initial UI: https://github.com/AdamSpannbauer/app_rasa_chat_bot/blob/master/dash_demo_app.py
 
@@ -81,7 +94,7 @@ app.layout = html.Div([
      
     html.H3('Nourish Chatbot',style={'text-align': 'center'}),
     html.H4('Please answer all questions as accurately as possible. If you are unsure, please ask the bot to try again.',
-            style={'text-align': 'center'}),
+            style={'text-align':'center'}),
     html.Div([
         html.Div(id='conversation'),
         html.Br(),
@@ -132,18 +145,20 @@ def update_conversation(click, text):
             try:
                 output_json = json.loads(agent_response)
                 if 'file_path' in output_json:
-                    additional_text = [html.H5(html.I(output_json['verbal_desc']), style={'text-align': 'left'})]
+                    additional_text = [html.H5(html.I(output_json['verbal_desc']), style=response_style)]
                     rspd =  [html.Iframe(src=output_json['file_path'], height="400px", width="1000px")] + additional_text
                 else:
-                    rspd = [html.H5(html.I(output_json['response']), style={'text-align': 'left'})]
+                    rspd = [html.H5(html.I(output_json['response']), style=response_style)]
             except:
-                rspd = [html.H5(html.I(agent_response), style={'text-align': 'left'})]
+                rspd = [html.H5(html.I(agent_response), style=response_style)]
         else:
-            rspd = ["You are still in ui dev. Restart app with ui_dev flag set to false to run agent."]
+            rspd = [html.H5(html.I(
+                "You are still in ui dev. Restart app with ui_dev flag set to false to run agent."),
+                style=response_style)]
 
 
         # user message aligned left
-        rcvd = [html.H5(html.B(text), style={'text-align': 'right', })]
+        rcvd = [html.H5(html.B(text), style=recieved_style)]
         
 
         # append interaction to conversation history
