@@ -100,12 +100,11 @@ app.layout = html.Div([
     html.Div([
         html.Div(id='conversation',
                  style={'width': '1000px', 'height': '500px', 'margin': '0 290px',
-                        # 'position':'fixed',
-                        # 'backgroundColor':'darkcyan',
+                        "display": "flex",
+                        "flex-direction": "column-reverse",
                         "overflow": "scroll",}),
         html.Div([
             html.Br(),
-            # html.Div(id="spacing",style={'height': '500px'}),
             dcc.Loading(
                         id="loading-1",
                         type="default",
@@ -119,7 +118,6 @@ app.layout = html.Div([
         ], 
         style={'width': '1000px',
                'display':'inline-block',
-            #    'position':'relative',
                'margin': '0 290px',
                }
         ),
@@ -138,6 +136,10 @@ app.layout = html.Div([
 )
 # function to add new user*bot interaction to conversation history
 def update_conversation(click, enter_press, text):
+    '''
+    Notice chat history is in opposite order
+    This was for simplicity so that the scroll bar stays at the bottom of the page
+    '''
     global conv_hist
 
     if (click == None and enter_press == None) or text == "":
@@ -155,7 +157,8 @@ def update_conversation(click, enter_press, text):
             output_json = json.loads(agent_response)
             if 'file_path' in output_json:
                 additional_text = [dcc.Markdown(output_json['verbal_desc'], style=response_style)]
-                rspd =  [html.Iframe(src=output_json['file_path'], height="400px", width="1000px")] + additional_text
+                # rspd = [html.Iframe(src=output_json['file_path'], height="400px", width="1000px")] + additional_text
+                rspd = additional_text + [html.Iframe(src=output_json['file_path'], height="400px", width="1000px")]
             else:
                 rspd = [dcc.Markdown(output_json['response'], style=response_style)]
         except:
@@ -178,7 +181,8 @@ python nourish_chatbot_app.py --ui_dev True
     rcvd = [html.H5(html.B(text), style=recieved_style)]
 
     # append interaction to conversation history
-    conv_hist = conv_hist + rcvd + rspd + [html.Hr()]
+    # conv_hist = conv_hist + rcvd + rspd + [html.Hr()]
+    conv_hist = [html.Hr()] + rspd + rcvd + conv_hist
 
     return "", conv_hist
 
