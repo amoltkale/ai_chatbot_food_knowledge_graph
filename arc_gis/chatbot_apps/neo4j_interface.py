@@ -17,6 +17,10 @@ from langchain.callbacks.manager import (
 
 from neo4j_database import Neo4jDatabase
 
+import sys
+# import to read configs
+sys.path.append('../../../../')
+from utils import get_postgres_db_obj, print_in_color, bcolors
 
 class BaseNeo4jDatabaseTool(BaseModel):
     """Base tool for interacting with a Neo4j database."""
@@ -120,10 +124,22 @@ class RelatedFoodListTool(BaseNeo4jDatabaseTool, BaseTool):
     
 class RelatedFoodIRIListTool(BaseNeo4jDatabaseTool, BaseTool):
     """Tool to create the cypher query to return the connected or alternative food products give a food type"""
-    name = 'related_food_iri_name_list'
+    name = 'ranked_food_list'
     description = f'''
+    Helps give markdown table for top 3 food items ranked foods according to ranks and another markdown table for bottom 3 ranked foods according to ranks by using output from related_food_iri_name_list tool.
+
     Input should be a food type.
-    Output would be a python list of food ontolgy iri names.
+    Output would be top 3 food items ranked foods according to ranks and another markdown table for bottom 3 ranked foods according to ranks. Additionally mention the count of related ranked food items from the initial output.
+    Output format should be as below : "
+    Top 3 food alternatives:
+    * food item1
+    * food item2
+    * food item3
+
+    Bottom 3 food alternatives:
+    * food item1
+    * food item2
+    * food item3"
     '''
     return_direct = False
     def _run(
@@ -141,8 +157,28 @@ class RelatedFoodIRIListTool(BaseNeo4jDatabaseTool, BaseTool):
                             WITH COLLECT(split(n.node_id, ".")[-1])[0] + COLLECT(split(m.node_id, ".")[-1]) AS related_list, score LIMIT 1
                             UNWIND related_list as related
                             RETURN collect(DISTINCT related)"""
-        result = self.db.query_no_throw(cypher_qyery)
-        print(result)
+        print_in_color(f"\nCypher QUERY: {cypher_qyery}", bcolors.AMBER)
+        iri_names_list = self.db.query_no_throw(cypher_qyery)
+        # print(iri_names_list)
+        # iri_names_list = iri_names_list[1:-1]
+        # print(iri_names_list)   
+        sql_query = f"""WITH fdc_list as
+                        (SELECT DISTINCT fdc_id, matched_components, product_desc
+                        FROM lexmapr_iri
+                        WHERE match_id = 1 AND component_iri = any(array{iri_names_list})), 
+                        hpf_fdc_list AS (SELECT DISTINCT ON (fdc_list.matched_components)
+                                            fdc_list.matched_components,
+                                            fdc_list.product_desc,
+                                            hpf.n,
+                                            hpf.hpf_score
+                                            FROM fdc_list INNER JOIN avg_hpf_scores as hpf
+                        ON fdc_list.matched_components = hpf.matched_components)
+                        SELECT ROW_NUMBER() OVER (ORDER BY hpf_score ASC) AS rank, *
+                        From hpf_fdc_list
+                        ORDER BY rank;"""
+        print_in_color(f"\nSQL QUERY: {sql_query}", bcolors.AMBER)
+        sql_db = get_postgres_db_obj()
+        result = sql_db.run_no_throw(sql_query)
         return result
 
     async def _arun(

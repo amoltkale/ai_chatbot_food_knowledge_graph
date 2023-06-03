@@ -47,7 +47,7 @@ def setup_agent_chain(neo4j_db:Neo4jDatabase, sql_db:SQLDatabase):
             #FoodIRITool(db=neo4j_db),
             #RelatedFoodListTool(db=neo4j_db),
             RelatedFoodIRIListTool(db=neo4j_db),
-            HealthyAndUnheathyFoodTool(db=sql_db)
+            #HealthyAndUnheathyFoodTool(db=sql_db)
             ]
 
     memory = ConversationBufferMemory(memory_key="chat_history")
@@ -68,6 +68,7 @@ if __name__ == '__main__':
     # Creating Postgres SQL DB
     sql_db = get_postgres_db_obj()
 
+    agent_chain = setup_agent_chain(neo4j_db=db,sql_db=sql_db)
     chat_history = get_welcome_prompt()
     with get_openai_callback() as cb:
         agent_chain.run(chat_history)
