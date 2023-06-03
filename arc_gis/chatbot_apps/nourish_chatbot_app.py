@@ -84,7 +84,8 @@ server = Flask(__name__)
 app = dash.Dash(name = __name__, server = server)
 
 # init a list of the sessions conversation history
-conv_hist = [html.Hr()] + [dcc.Markdown(intial_response, style=response_style)] + [html.Hr()]
+# conv_hist = [html.Hr()] + [dcc.Markdown(intial_response, style=response_style)] + [html.Hr()]
+conv_hist = [dcc.Markdown("---")] + [dcc.Markdown(intial_response, style=response_style)] + [dcc.Markdown("---")]
 
 # credit to initial UI: https://github.com/AdamSpannbauer/app_rasa_chat_bot/blob/master/dash_demo_app.py
 
@@ -182,7 +183,7 @@ python nourish_chatbot_app.py --ui_dev True
 
     # append interaction to conversation history
     # conv_hist = conv_hist + rcvd + rspd + [html.Hr()]
-    conv_hist = [html.Hr()] + rspd + rcvd + conv_hist
+    conv_hist = [dcc.Markdown("---")] + rspd + rcvd + conv_hist
 
     return "", conv_hist
 
