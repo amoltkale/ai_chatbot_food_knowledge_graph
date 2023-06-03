@@ -6,6 +6,8 @@ CREATE  MATERIALIZED VIEW  lexmapr_iri as SELECT fdc_id, "Product_Desc" as produ
        unnest(regexp_matches("Matched_Components", '(?<=:)(.*?)(?=,\s|$)', 'g')) as component_iri
 FROM "LexMaprMapping_Products";
 
+alter materialized view lexmapr_iri owner to nourish;
+
 CREATE MATERIALIZED VIEW  avg_hpf_scores as SELECT
     fdc_list.matched_components,
     COUNT(matched_components) AS n,
@@ -16,6 +18,8 @@ FROM usda_2022_hpf_component as hpf inner join lexmapr_iri As fdc_list
     ON fdc_list.fdc_id = hpf.fdc_id
 GROUP BY matched_components
 ORDER BY hpf_score;
+
+alter materialized view avg_hpf_scores owner to nourish;
 
 -- Hot dog query example
 WITH fdc_list as
