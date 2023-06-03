@@ -131,12 +131,13 @@ class RelatedFoodIRIListTool(BaseNeo4jDatabaseTool, BaseTool):
     Input should be a food type.
     Output would be top 3 food items ranked foods according to ranks and another markdown table for bottom 3 ranked foods according to ranks. Additionally mention the count of related ranked food items from the initial output.
     Output format should be as below : "
-    Top 3 food alternatives:
+    Here is a list of related food items to foot type. The results have been scored based off the percentage of carbohydrates, fats, sugar and sodium.
+    Three best food alternatives according to our scores:
     * food item1
     * food item2
     * food item3
 
-    Bottom 3 food alternatives:
+    Three worst alternatives according to our scores:
     * food item1
     * food item2
     * food item3"
