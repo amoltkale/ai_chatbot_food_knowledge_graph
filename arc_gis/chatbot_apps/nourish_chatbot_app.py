@@ -91,30 +91,41 @@ conv_hist = [html.Hr()] + [dcc.Markdown(intial_response, style=response_style)] 
 # app ui
 app.layout = html.Div([
     html.Div([
-    html.Img(src='static/nourish_logo.png', height="100px", width="100px"),
+    html.Div([html.Img(src='static/nourish_logo.png', height="100px", width="100px")],
+              style={'width': '49%', 'display': 'inline-block'}),
     html.H3('Nourish Chatbot',style={'text-align': 'center'}),
     html.H4('Please answer all questions as accurately as possible. If you are unsure, please ask the bot to try again.',
             style={'text-align':'center'})
-    ]),
+    ], style={'width': '99%', 'display': 'inline-block', 'padding': '0 20'}),
     html.Div([
-        html.Div(id='conversation'),
-        ],
+        html.Div(id='conversation',
+                 style={'width': '1000px', 'height': '500px', 'margin': '0 290px',
+                        # 'position':'fixed',
+                        # 'backgroundColor':'darkcyan',
+                        "overflow": "scroll",}),
+        html.Div([
+            html.Br(),
+            # html.Div(id="spacing",style={'height': '500px'}),
+            dcc.Loading(
+                        id="loading-1",
+                        type="default",
+                        children=html.Div([
+                        dcc.Input(id='msg_input', 
+                                value='', type='text', spellCheck=True, debounce=True,
+                                style={'width':'925px'}),
+                        html.Button('>>>', id='send_button', type='submit',style={'width':'60px'})
+                        ],)
+                        ),
+        ], 
+        style={'width': '1000px',
+               'display':'inline-block',
+            #    'position':'relative',
+               'margin': '0 290px',
+               }
+        ),
+    ],
         id='screen',
-        style={'width': '1000px', 'margin': '0 auto'}
     ),
-    html.Div([
-        html.Br(),
-        dcc.Loading(
-                    id="loading-1",
-                    type="default",
-                    children=html.Div([
-                    dcc.Input(id='msg_input', 
-                              value='', type='text', spellCheck=True, debounce=True,
-                              style={'width':'925px'}),
-                    html.Button('>>>', id='send_button', type='submit',style={'width':'60px'})
-                    ],)
-                    ),
-    ], style={'width': '1000px', 'margin': '0 auto'}),
 ])
 
 # trigger bot response to user inputted message on submit button click
