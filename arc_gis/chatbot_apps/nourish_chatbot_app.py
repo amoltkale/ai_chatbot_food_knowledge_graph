@@ -32,6 +32,16 @@ response_style={
     # 'backgroundColor':'rgb(100, 100, 100)'
     }
 
+def append_message(history, message, i):
+    if isinstance(message, list):
+        for m in message:
+            history[i] = m
+            i = i - 1
+    else:
+        history[i] = m
+        i = i - 1
+    return history, i
+
 def parse_args():
     parser = argparse.ArgumentParser(description = 'Grab some variables about how to run the app')
     parser.add_argument('--email', type=str, default="m.hernandez@gmail.com",
@@ -84,8 +94,10 @@ server = Flask(__name__)
 app = dash.Dash(name = __name__, server = server)
 
 # init a list of the sessions conversation history
-# conv_hist = [html.Hr()] + [dcc.Markdown(intial_response, style=response_style)] + [html.Hr()]
-conv_hist = [dcc.Markdown("---")] + [dcc.Markdown(intial_response, style=response_style)] + [dcc.Markdown("---")]
+conv_hist = [None] * 30000
+index = len(conv_hist) - 1
+message = [dcc.Markdown("---")] + [dcc.Markdown(intial_response, style=response_style)] + [dcc.Markdown("---")]
+conv_hist, index = append_message(conv_hist, message, index)
 
 # credit to initial UI: https://github.com/AdamSpannbauer/app_rasa_chat_bot/blob/master/dash_demo_app.py
 
@@ -93,14 +105,18 @@ conv_hist = [dcc.Markdown("---")] + [dcc.Markdown(intial_response, style=respons
 app.layout = html.Div([
     html.Div([
     html.Div([html.Img(src='static/nourish_logo.png', height="100px", width="100px")],
-              style={'width': '49%', 'display': 'inline-block'}),
-    html.H3('Nourish Chatbot',style={'text-align': 'center'}),
+              style={'width': '49%', 'display': 'inline-block',
+                    #  'backgroundColor':'darkcyan'
+                     }),
+    html.H3('Nourish Chatbot',style={'text-align': 'center', 'display': 'inline-block',
+                                    #  'backgroundColor':'blue'
+                                     }),
     html.H4('Please answer all questions as accurately as possible. If you are unsure, please ask the bot to try again.',
             style={'text-align':'center'})
     ], style={'width': '99%', 'display': 'inline-block', 'padding': '0 20'}),
     html.Div([
         html.Div(id='conversation',
-                 style={'width': '1000px', 'height': '500px', 'margin': '0 290px',
+                 style={'width': '1000px', 'height': '550px', 'margin': '0 290px',
                         "display": "flex",
                         "flex-direction": "column-reverse",
                         "overflow": "scroll",}),
@@ -112,8 +128,16 @@ app.layout = html.Div([
                         children=html.Div([
                         dcc.Input(id='msg_input', 
                                 value='', type='text', spellCheck=True, debounce=True,
-                                style={'width':'925px'}),
-                        html.Button('>>>', id='send_button', type='submit',style={'width':'60px'})
+                                style={'width':'915px'},
+                                placeholder='Send a message'),
+                        html.Button('>>>', id='send_button', type='submit',
+                                    style={"margin": "0 10px",
+                                            "width": "45px",
+                                           "borderRadius": "30%",
+                                        #    'backgroundColor':'rgb(0, 204, 68)', 'color':'white'
+                                            'backgroundColor':'rgb(80, 80, 80)', 'color':'rgb(150, 150, 150)'
+                                           }
+                                    )
                         ],)
                         ),
         ], 
@@ -138,10 +162,15 @@ app.layout = html.Div([
 # function to add new user*bot interaction to conversation history
 def update_conversation(click, enter_press, text):
     '''
-    Notice chat history is in opposite order
-    This was for simplicity so that the scroll bar stays at the bottom of the page
+    Notice chat history is being put in reverse order in a predefined list
+    This results in a max chat history length
+    The reason for this is to prevent auto reloads of items to the chat history
+    By trying to prepend items to a list, it forces the entire chat to refresh since the list is made anew
+    Deque is not json serializable hence why it is not used
+    Ideally, static htmls should be appended in some other fashion
     '''
     global conv_hist
+    global index
 
     if (click == None and enter_press == None) or text == "":
         # dont do anything if text is empty
@@ -158,14 +187,27 @@ def update_conversation(click, enter_press, text):
             output_json = json.loads(agent_response)
             if 'file_path' in output_json:
                 additional_text = [dcc.Markdown(output_json['verbal_desc'], style=response_style)]
-                # rspd = [html.Iframe(src=output_json['file_path'], height="400px", width="1000px")] + additional_text
-                rspd = additional_text + [html.Iframe(src=output_json['file_path'], height="400px", width="1000px")]
+                rspd = [html.Iframe(src=output_json['file_path'],
+                                    height="350px", width="700px")] + additional_text
             else:
                 rspd = [dcc.Markdown(output_json['response'], style=response_style)]
         except:
             rspd = [dcc.Markdown(agent_response, style=response_style)]
     else:
-        rspd = [dcc.Markdown("""
+        if "map" in text:
+            # serve_image()
+            if "1" in text:
+                html_src = "static/map_test.html"
+            elif "2" in text:
+                html_src = "static/map_test_2.html"
+            rspd = [html.H5(html.I("start"))] + \
+                    [html.Div([html.Iframe(src=html_src,
+                        height="350px", width="700px")])] + \
+                    [html.H5(html.I("end"))]
+            # rspd = [html.Div([html.Iframe(src=html_src,
+            #             height="400px", width="800px")])]
+        else:
+            rspd = [dcc.Markdown("""
 You are still in ui dev. Restart app with ui_dev flag set to false to run agent.  
 Currently Available parameters are the following:  
 ------
@@ -182,8 +224,10 @@ python nourish_chatbot_app.py --ui_dev True
     rcvd = [html.H5(html.B(text), style=recieved_style)]
 
     # append interaction to conversation history
-    # conv_hist = conv_hist + rcvd + rspd + [html.Hr()]
-    conv_hist = [dcc.Markdown("---")] + rspd + rcvd + conv_hist
+    message =  rcvd + rspd  + [dcc.Markdown("---")]
+
+    # message = [dcc.Markdown("---")] + rspd + rcvd
+    conv_hist, index = append_message(conv_hist, message, index)
 
     return "", conv_hist
 
