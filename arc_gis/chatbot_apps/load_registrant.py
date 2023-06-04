@@ -67,6 +67,7 @@ def get_welcome_prompt():
                 There is no need to understand their business profile and funding needs right now. 
                 Please treat the person as if you are directly talking with them.
                 Make your response professional, friendly, and concise.
+                Do not inform the users about the using the tools directly.
                 End by asking "How can I help you"?
                 Here is general information on the person you are talking to: {{{user_profile}}}
                 Here is the business profile in json format: {{{biz_profile}}}

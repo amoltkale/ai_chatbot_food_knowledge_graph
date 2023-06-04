@@ -40,7 +40,7 @@ description = f'''
                 Additionally provide brief one sentence description for any loans found.
                 If they do not qualify for any loans, state the reason. 
                 Make sure to use the observation for answering.
-                Input should be person's home_address, ethnicity,languages_spoken, extending_existing_business, prospective_business_description, gender, desired_funding, business_role, business_profile in a json format.
+                Input should be person's home_address, extending_existing_business, prospective_business_description, desired_funding, business_role, business_profile in a json format.
                 '''
 
 #        Input should be general information and business profile about the person in a json format.

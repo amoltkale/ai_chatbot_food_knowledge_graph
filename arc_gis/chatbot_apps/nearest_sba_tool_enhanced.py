@@ -34,8 +34,6 @@ description = f'''
 Gives contact information on nearest help for Small Business Development Agency / SBA / Small Business Administrations /
 Small Business Development Agency affiliated with the SBA."
 Input must be valid home address from the user or an address provided to be checked for nearest facility from memory.
-The address should abide by the standard of  United States of America.
-If you don't know the value to be assigned to a key, omit the key.
 Output must be valid JSON in the following format: {output_format}. 
 Try to refer Small Business Development Agency instead of SBA while responding.
 '''
