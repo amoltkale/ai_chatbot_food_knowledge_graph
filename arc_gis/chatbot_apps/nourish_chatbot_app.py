@@ -24,10 +24,13 @@ from load_registrant import get_welcome_prompt, set_enviro_email
 # set up response style
 recieved_style={
     'text-align':'right',
-    'color':'white',}
+    'marginRight': '15px',
+    'color':'white',
+    }
 
 response_style={
     'text-align':'left',
+    'marginRight': '15px',
     # 'color':'rgb(80,36,97)',
     # 'backgroundColor':'rgb(100, 100, 100)'
     }
@@ -91,7 +94,9 @@ app = dash.Dash(name = __name__, server = server)
 # init a list of the sessions conversation history
 conv_hist = [None] * 30000
 index = len(conv_hist) - 1
-message = [dcc.Markdown("---")] + [dcc.Markdown(intial_response, style=response_style)] + [dcc.Markdown("---")]
+message = [dcc.Markdown("---", style={'marginRight':'15px',})] + \
+            [dcc.Markdown(intial_response, style=response_style)] + \
+            [dcc.Markdown("---", style={'marginRight':'15px',})]
 conv_hist, index = append_message(conv_hist, message, index)
 
 # credit to initial UI: https://github.com/AdamSpannbauer/app_rasa_chat_bot/blob/master/dash_demo_app.py
@@ -99,21 +104,32 @@ conv_hist, index = append_message(conv_hist, message, index)
 # app ui
 app.layout = html.Div([
     html.Div([
-    html.Div([html.Img(src='static/nourish_logo.png', height="100px", width="100px")],
-              style={'width': '49%', 'display': 'inline-block',
-                    #  'backgroundColor':'darkcyan'
-                     }),
-    html.H3('Nourish Chatbot',style={'text-align': 'center', 'display': 'inline-block',
-                                    #  'backgroundColor':'blue'
-                                     }),
-    html.H4('Please answer all questions as accurately as possible. If you are unsure, please ask the bot to try again.',
-            style={'text-align':'center'})
-    ], style={'width': '99%', 'display': 'inline-block', 'padding': '0 20'}),
+        html.Div([html.Img(src='static/nourish_logo.png', height="100px", width="100px")],
+                style={'width': '14%', 'display': 'inline-block',
+                        #  'backgroundColor':'darkcyan'
+                        }),
+        dcc.Markdown('### Please answer all questions as accurately as possible.',
+                    style={'text-align':'center',
+                            # 'display': 'inline-block',
+                            'margin': '-80px 0',
+                            'marginRight': '15px',
+                            # 'backgroundColor':'blue'
+                            }),
+        dcc.Markdown('## Nourish Chatbot',
+                style={'text-align':'center',
+                    #    'marginRight': '15px',
+                    #    'margin': '-30px 0'
+                       })
+    ], style={'width': '99%', 'display': 'inline-block',
+            #   'padding': '0 20'
+              }),
     html.Div([
+        html.Br(),
         html.Div(id='conversation',
-                 style={'width': '1000px', 'height': '550px', 'margin': '0 290px',
+                 style={'width': '1000px', 'height': '650px', 'margin': '0 290px',
                         "display": "flex",
                         "flex-direction": "column-reverse",
+                        # 'backgroundColor':'green',
                         "overflow": "scroll",}),
         html.Div([
             html.Br(),
@@ -123,7 +139,11 @@ app.layout = html.Div([
                         children=html.Div([
                         dcc.Input(id='msg_input', 
                                 value='', type='text', spellCheck=True, debounce=True,
-                                style={'width':'915px'},
+                                autoFocus='autofocus',
+                                style={'width':'928px',
+                                       'backgroundColor':'rgb(80, 80, 80)',
+                                       'color': 'white',
+                                       },
                                 placeholder='Send a message'),
                         html.Button('>>>', id='send_button', type='submit',
                                     style={"margin": "0 10px",
@@ -183,7 +203,7 @@ def update_conversation(click, enter_press, text):
             if 'file_path' in output_json:
                 additional_text = [dcc.Markdown(output_json['verbal_desc'], style=response_style)]
                 # rspd = [html.Iframe(src=output_json['file_path'], height="350px", width="750px")] + additional_text
-                rspd = [html.Div([html.Iframe(src=output_json['file_path'], height="300px", width="750px")])]+ \
+                rspd = [html.Div([html.Iframe(src=output_json['file_path'], height="350px", width="750px")])]+ \
                     additional_text
             else:
                 rspd = [dcc.Markdown(output_json['response'], style=response_style)]
@@ -221,9 +241,9 @@ python nourish_chatbot_app.py --ui_dev True
     rcvd = [html.H5(html.B(text), style=recieved_style)]
 
     # append interaction to conversation history
-    message =  rcvd + rspd  + [dcc.Markdown("---")]
+    message =  rcvd + rspd  + [dcc.Markdown("---", style={'marginRight':'15px',})]
 
-    # message = [dcc.Markdown("---")] + rspd + rcvd
+    # message = [dcc.Markdown("---", style={'marginRight':'15px',})] + rspd + rcvd
     conv_hist, index = append_message(conv_hist, message, index)
 
     return "", conv_hist
