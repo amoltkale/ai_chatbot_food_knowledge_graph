@@ -104,7 +104,7 @@ conv_hist, index = append_message(conv_hist, message, index)
 # app ui
 app.layout = html.Div([
     html.Div([
-    html.Div([html.Img(src='static/nourish_logo.png', height="75px", width="100px")],
+    html.Div([html.Img(src='static/nourish_logo.png', height="100px", width="100px")],
               style={'width': '49%', 'display': 'inline-block',
                     #  'backgroundColor':'darkcyan'
                      }),
@@ -128,8 +128,16 @@ app.layout = html.Div([
                         children=html.Div([
                         dcc.Input(id='msg_input', 
                                 value='', type='text', spellCheck=True, debounce=True,
-                                style={'width':'925px'}),
-                        html.Button('>>>', id='send_button', type='submit',style={'width':'60px'})
+                                style={'width':'915px'},
+                                placeholder='Send a message'),
+                        html.Button('>>>', id='send_button', type='submit',
+                                    style={"margin": "0 10px",
+                                            "width": "45px",
+                                           "borderRadius": "30%",
+                                        #    'backgroundColor':'rgb(0, 204, 68)', 'color':'white'
+                                            'backgroundColor':'rgb(80, 80, 80)', 'color':'rgb(150, 150, 150)'
+                                           }
+                                    )
                         ],)
                         ),
         ], 
