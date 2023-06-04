@@ -10,14 +10,11 @@ from dash import dcc, html
 from flask import Flask
 import flask
 
-from langchain import OpenAI, ConversationChain, LLMChain, PromptTemplate
-from langchain.memory import ConversationBufferMemory, ReadOnlySharedMemory
-from langchain.agents import ZeroShotAgent, Tool, AgentExecutor
 from langchain.callbacks import get_openai_callback
 
 # import to read configs
 sys.path.append('../../')
-from utils import get_config, get_postgres_db_obj
+from utils import get_config
 
 from load_registrant import get_welcome_prompt, set_enviro_email
 
@@ -25,12 +22,13 @@ from load_registrant import get_welcome_prompt, set_enviro_email
 recieved_style={
     'text-align':'right',
     'marginRight': '15px',
+    'marginLeft': '200px',
     'color':'white',
     }
 
 response_style={
     'text-align':'left',
-    'marginRight': '15px',
+    'marginRight': '200px',
     # 'color':'rgb(80,36,97)',
     # 'backgroundColor':'rgb(100, 100, 100)'
     }
@@ -203,7 +201,7 @@ def update_conversation(click, enter_press, text):
             if 'file_path' in output_json:
                 additional_text = [dcc.Markdown(output_json['verbal_desc'], style=response_style)]
                 # rspd = [html.Iframe(src=output_json['file_path'], height="350px", width="750px")] + additional_text
-                rspd = [html.Div([html.Iframe(src=output_json['file_path'], height="350px", width="750px")])]+ \
+                rspd = [html.Div([html.Iframe(src=output_json['file_path'], height="350px", width="800px")])]+ \
                     additional_text
             else:
                 rspd = [dcc.Markdown(output_json['response'], style=response_style)]
@@ -257,5 +255,5 @@ def serve_static(resource):
 # run app
 if __name__ == '__main__':
     #webbrowser.open('http://127.0.0.1:8050/', new=0, autoraise=True) 
-    app.run_server(debug=True)
+    app.run_server(debug=False)
     # app.run_server()
