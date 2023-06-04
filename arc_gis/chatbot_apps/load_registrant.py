@@ -64,9 +64,7 @@ def get_welcome_prompt():
     #          """
     prompt = f"""
                 State the speaker's business and intended use of the funding in one sentence. 
-                There is no need to understand their business profile and funding needs right now.
-                Do not list loan eligibity here.
-                You are directly talking to the author so do not add any preamble like "based on your text". 
+                There is no need to understand their business profile and funding needs right now. 
                 Please treat the person as if you are directly talking with them.
                 Make your response professional, friendly, and concise.
                 End by asking "How can I help you"?

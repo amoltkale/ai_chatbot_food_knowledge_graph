@@ -38,11 +38,13 @@ description = f'''
                 REMEMBER YOU ARE TALKING DIRECTLY TO THE PERSON.
                 Find any loans the person might qualify for based on their funding needs and business profile. 
                 Additionally provide brief one sentence description for any loans found.
-                If they do not qualify for any loans, state the reason.
-                REMEMBER YOU ARE TALKING DIRECTLY TO THE PERSON.
-                RESPOND IN FIRST PERSON ONLY.
-                DO NOT LOSE ANY INFORMATION WHEN YOU REFORMAT THE THOUGHT.
-'''
+                If they do not qualify for any loans, state the reason. 
+                Make sure to use the observation for answering.
+                Input should be person's ethnicity,languages_spoken, extending_existing_business, prospective_business_description, gender, desired_funding, business_role, business_profile in a json format.
+                '''
+
+#        Input should be general information and business profile about the person in a json format.
+
 # create an instance of the custom langchain tool
 FundingDocIndexTool = Tool(
     name=name,
