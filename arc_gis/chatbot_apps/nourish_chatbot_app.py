@@ -94,7 +94,6 @@ server = Flask(__name__)
 app = dash.Dash(name = __name__, server = server)
 
 # init a list of the sessions conversation history
-# conv_hist = [html.Hr()] + [dcc.Markdown(intial_response, style=response_style)] + [html.Hr()]
 conv_hist = [None] * 30000
 index = len(conv_hist) - 1
 message = [dcc.Markdown("---")] + [dcc.Markdown(intial_response, style=response_style)] + [dcc.Markdown("---")]
@@ -105,15 +104,19 @@ conv_hist, index = append_message(conv_hist, message, index)
 # app ui
 app.layout = html.Div([
     html.Div([
-    html.Div([html.Img(src='static/nourish_logo.png', height="100px", width="100px")],
-              style={'width': '49%', 'display': 'inline-block'}),
-    html.H3('Nourish Chatbot',style={'text-align': 'center'}),
+    html.Div([html.Img(src='static/nourish_logo.png', height="75px", width="100px")],
+              style={'width': '49%', 'display': 'inline-block',
+                    #  'backgroundColor':'darkcyan'
+                     }),
+    html.H3('Nourish Chatbot',style={'text-align': 'center', 'display': 'inline-block',
+                                    #  'backgroundColor':'blue'
+                                     }),
     html.H4('Please answer all questions as accurately as possible. If you are unsure, please ask the bot to try again.',
             style={'text-align':'center'})
     ], style={'width': '99%', 'display': 'inline-block', 'padding': '0 20'}),
     html.Div([
         html.Div(id='conversation',
-                 style={'width': '1000px', 'height': '500px', 'margin': '0 290px',
+                 style={'width': '1000px', 'height': '550px', 'margin': '0 290px',
                         "display": "flex",
                         "flex-direction": "column-reverse",
                         "overflow": "scroll",}),
@@ -176,8 +179,8 @@ def update_conversation(click, enter_press, text):
             output_json = json.loads(agent_response)
             if 'file_path' in output_json:
                 additional_text = [dcc.Markdown(output_json['verbal_desc'], style=response_style)]
-                rspd = [html.Iframe(src=output_json['file_path'], height="400px", width="1000px")] + additional_text
-                # rspd = additional_text + [html.Iframe(src=output_json['file_path'], height="400px", width="1000px")]
+                rspd = [html.Iframe(src=output_json['file_path'],
+                                    height="350px", width="700px")] + additional_text
             else:
                 rspd = [dcc.Markdown(output_json['response'], style=response_style)]
         except:
@@ -191,7 +194,7 @@ def update_conversation(click, enter_press, text):
                 html_src = "static/map_test_2.html"
             rspd = [html.H5(html.I("start"))] + \
                     [html.Div([html.Iframe(src=html_src,
-                        height="400px", width="800px")])] + \
+                        height="350px", width="700px")])] + \
                     [html.H5(html.I("end"))]
             # rspd = [html.Div([html.Iframe(src=html_src,
             #             height="400px", width="800px")])]
