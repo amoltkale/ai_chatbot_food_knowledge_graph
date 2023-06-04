@@ -1,19 +1,17 @@
 import sys
 import argparse
-from langchain import OpenAI, ConversationChain, LLMChain, PromptTemplate
-from langchain.memory import ConversationBufferMemory, ReadOnlySharedMemory
-from langchain.agents import ZeroShotAgent, Tool, AgentExecutor, ConversationalChatAgent, AgentType, initialize_agent
+from langchain.memory import ConversationBufferMemory
+from langchain.agents import AgentType, initialize_agent
 from langchain.callbacks import get_openai_callback
-from langchain import SQLDatabase
 
 from load_registrant import get_welcome_prompt, set_enviro_email, user_menu
 from neo4j_database import Neo4jDatabase
 
 # import to read configs
 sys.path.append('../../../../')
-from utils import get_config, bcolors, print_in_color, get_postgres_db_obj
+from utils import bcolors, print_in_color, get_postgres_db_obj
 
-from llm_utils import get_gpt_4_openai_llm, get_default_openai_llm
+from llm_utils import get_default_openai_llm
 
 def parse_args():
     parser = argparse.ArgumentParser(description = 'Grab some variables about how to run the app')
@@ -23,31 +21,22 @@ def parse_args():
                         help="Directly ask agent chain a question")
     return parser.parse_args()
 
-def setup_agent_chain(neo4j_db:Neo4jDatabase):
+def setup_agent_chain():
     # from tools_agent import agent
     from location_recommendation_tool import LocationRecommendation
-    from load_registrant_tool import LoadRegistrant
-    from funding_recommendation_tool import FundingRecommendation
-    from nearest_sba_tool import NearestSBATool
     from sba_doc_index_tool import SBADocIndexTool
     from funding_doc_index_tool import FundingDocIndexTool
-    from neo4j_interface import FoodIRITool, RelatedFoodListTool, RelatedFoodIRIListTool
+    from neo4j_interface import  RelatedFoodIRIListTool
     from nearest_sba_tool_enhanced import NearestSBAToolEnhanced
-    from postgres_interface import HealthyAndUnheathyFoodTool
 
     llm = get_default_openai_llm()
 
     tools = [
-            # LoadRegistrant,
             LocationRecommendation,
             FundingDocIndexTool,
             SBADocIndexTool,
-            #NearestSBATool,
             NearestSBAToolEnhanced,
-            #FoodIRITool(db=neo4j_db),
-            #RelatedFoodListTool(db=neo4j_db),
-            RelatedFoodIRIListTool(db=neo4j_db),
-            #HealthyAndUnheathyFoodTool(db=sql_db)
+            RelatedFoodIRIListTool(),
             ]
 
     memory = ConversationBufferMemory(memory_key="chat_history")
@@ -61,14 +50,11 @@ if __name__ == '__main__':
     # Set email for chat
     args = parse_args()
     set_enviro_email(args.email)
-    
-    #set_enviro_email(user_menu())
-    db:Neo4jDatabase = Neo4jDatabase()
 
     # Creating Postgres SQL DB
     sql_db = get_postgres_db_obj()
 
-    agent_chain = setup_agent_chain(neo4j_db=db,sql_db=sql_db)
+    agent_chain = setup_agent_chain()
     chat_history = get_welcome_prompt()
     with get_openai_callback() as cb:
         agent_chain.run(chat_history)

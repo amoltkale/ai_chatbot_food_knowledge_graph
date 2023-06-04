@@ -25,7 +25,7 @@ from utils import get_postgres_db_obj, print_in_color, bcolors
 class BaseNeo4jDatabaseTool(BaseModel):
     """Base tool for interacting with a Neo4j database."""
 
-    db: Neo4jDatabase = Field(exclude=True)
+    #db: Neo4jDatabase = Field(exclude=True)
 
     # Override BaseTool.Config to appease mypy
     # See https://github.com/pydantic/pydantic/issues/4173
@@ -53,7 +53,9 @@ class FoodIRITool(BaseNeo4jDatabaseTool, BaseTool):
         run_manager: Optional[CallbackManagerForToolRun] = None,
     ) -> str:
         """Execute the query, return the results or an error message."""
-        result = self.db.query_no_throw(query)
+        db = Neo4jDatabase()
+        result = db.query_no_throw(query)
+        db.close_session()
         return result
 
     async def _arun(
@@ -62,65 +64,7 @@ class FoodIRITool(BaseNeo4jDatabaseTool, BaseTool):
         run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
     ) -> str:
         raise NotImplementedError("FoodIRITool does not support async")
-
-class RelatedFoodListFromIRITool(BaseNeo4jDatabaseTool, BaseTool):
-    """Tool to create the cypher query with fulltext index search to get Food IRI property"""
-    name = 'food_list_from_iri'
-    description = f'''
-    Helps to return the connected food products give a food iri value .
-    Input should be a cypher query with iri as parameter as per example provided here.
-    Output would be list of related food products using is_a relationship as per the query execution.
-
-    Example Cypher Query:
-    Here to get the related food products with iri = "http://purl.obolibrary.org/obo/FOODON_00001009", cypher query to be executed would be as below:
-    MATCH p=(n:Concept)<-[r:is_a*..2]-(m) WHERE n.iri = "http://purl.obolibrary.org/obo/FOODON_00001009" return collect(n.label[0])[0] + collect(m.label[0]) as related_food_products_list
-    '''
-    def _run(
-        self,
-        query: str,
-        run_manager: Optional[CallbackManagerForToolRun] = None,
-    ) -> str:
-        """Execute the query, return the results or an error message."""
-        result = self.db.query_no_throw(query)
-        return result
-
-    async def _arun(
-        self,
-        query: str,
-        run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
-    ) -> str:
-        raise NotImplementedError("RelatedFoodListFromIRITool does not support async")
     
-class RelatedFoodListTool(BaseNeo4jDatabaseTool, BaseTool):
-    """Tool to create the cypher query to return the connected or alternative food products give a food type"""
-    name = 'food_list'
-    description = f'''
-    Helps to return the connected or alternative food products give a food type .
-    Input should be a food type to extract alternative of list of related foods.
-    Output would be list of related food products phrased in a way to show it is according to our analysis and database.
-    '''
-    def _run(
-        self,
-        food_type: str,
-        run_manager: Optional[CallbackManagerForToolRun] = None,
-    ) -> str:
-        """Execute the query created by using the food type, return the results or an error message."""
-        cypher_qyery = f"""CALL db.index.fulltext.queryNodes("label_index", "{food_type}") YIELD node, score
-            WITH node.iri AS n, round(score, 4) AS s
-            ORDER BY s DESC
-            WITH s AS score, COUNT(s) AS score_count, collect(n) AS node_list
-            MATCH p=(n:Concept)<-[r:is_a*..4]-(m)
-            WHERE n.iri IN (node_list)
-            RETURN COLLECT(n.label[0])[0] + COLLECT(m.label[0]) AS food_list, score LIMIT 1"""
-        result = self.db.query_no_throw(cypher_qyery)
-        return result
-
-    async def _arun(
-        self,
-        query: str,
-        run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
-    ) -> str:
-        raise NotImplementedError("RelatedFoodListTool does not support async")
     
 class RelatedFoodIRIListTool(BaseNeo4jDatabaseTool, BaseTool):
     """Tool to create the cypher query to return the connected or alternative food products give a food type"""
@@ -159,7 +103,9 @@ class RelatedFoodIRIListTool(BaseNeo4jDatabaseTool, BaseTool):
                             UNWIND related_list as related
                             RETURN collect(DISTINCT related)"""
         print_in_color(f"\nCypher QUERY: {cypher_qyery}", bcolors.AMBER)
-        iri_names_list = self.db.query_no_throw(cypher_qyery)
+        db = Neo4jDatabase()
+        iri_names_list = db.query_no_throw(cypher_qyery)
+        db.close_session()
         # print(iri_names_list)
         # iri_names_list = iri_names_list[1:-1]
         # print(iri_names_list)   
@@ -214,43 +160,6 @@ class QueryNeo4jDataBaseTool(BaseNeo4jDatabaseTool,BaseTool):
         run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
     ) -> str:
         raise NotImplementedError("QueryNeo4jDataBaseTool does not support async")
-
-class InfoNeo4jDatabaseTool(BaseNeo4jDatabaseTool, BaseTool):
-    """Tool for getting metadata about a Neo4j database."""
-
-    name = "schema_neo4j_db"
-    description = """
-    Input to this tool is list of labels and relationship labels , output is the properties associated with.
-    Be sure that the labels and relationships actually exist by calling list_tables_sql_db first!
-    Output 
-    Example Input: "neo4j"
-    """
-
-    def _run(
-        self,
-        table_names: str,
-        run_manager: Optional[CallbackManagerForToolRun] = None,
-    ) -> str:
-        """Get the schema for tables in a comma-separated list."""
-        return self.db.get_table_info_no_throw(table_names.split(", "))
-
-    async def _arun(
-        self,
-        table_name: str,
-        run_manager: Optional[AsyncCallbackManagerForToolRun] = None,
-    ) -> str:
-        raise NotImplementedError("SchemaSqlDbTool does not support async")
-
-class ListNeo4jDatabaseTool(BaseNeo4jDatabaseTool, BaseTool):
-    """Tool for getting list of all node labels and relationship labels."""
-
-    name = "get_node_and_egde_labels"
-    description = """
-    Input to this tool is the database name, output is json with node labels and edge labels.
-
-    Example Input: "neo4j"
-    """
-
 
 
 class Neo4jDatabaseToolkit(BaseToolkit):

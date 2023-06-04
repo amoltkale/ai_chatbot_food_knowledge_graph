@@ -70,12 +70,7 @@ if not args.ui_dev:
     # Establish user email
     set_enviro_email(args.email)
 
-    db:Neo4jDatabase = Neo4jDatabase()
-
-    # Creating Postgres SQL DB
-    sql_db = get_postgres_db_obj()
-
-    agent_chain = setup_agent_chain(neo4j_db=db,sql_db=sql_db)
+    agent_chain = setup_agent_chain()
 
     # intial_response = "Hello"
     with get_openai_callback() as cb:
@@ -187,8 +182,9 @@ def update_conversation(click, enter_press, text):
             output_json = json.loads(agent_response)
             if 'file_path' in output_json:
                 additional_text = [dcc.Markdown(output_json['verbal_desc'], style=response_style)]
-                rspd = [html.Iframe(src=output_json['file_path'],
-                                    height="350px", width="700px")] + additional_text
+                # rspd = [html.Iframe(src=output_json['file_path'], height="350px", width="750px")] + additional_text
+                rspd = [html.Div([html.Iframe(src=output_json['file_path'], height="300px", width="750px")])]+ \
+                    additional_text
             else:
                 rspd = [dcc.Markdown(output_json['response'], style=response_style)]
         except:
@@ -202,7 +198,8 @@ def update_conversation(click, enter_press, text):
                 html_src = "static/map_test_2.html"
             rspd = [html.H5(html.I("start"))] + \
                     [html.Div([html.Iframe(src=html_src,
-                        height="350px", width="700px")])] + \
+                                           
+                        height="350px", width="750px")])] + \
                     [html.H5(html.I("end"))]
             # rspd = [html.Div([html.Iframe(src=html_src,
             #             height="400px", width="800px")])]

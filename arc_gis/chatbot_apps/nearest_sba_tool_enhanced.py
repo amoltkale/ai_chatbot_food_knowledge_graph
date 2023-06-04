@@ -31,9 +31,9 @@ request_format = '{{"home_street_address":"home_street_address","home_zip":"home
 output_format = '{{"nearest_facility":"facility_address","facility_name":"facility_name","organization_name":"organization_name","contact_number":"contact_number","distance":"distance_in_miles","specific_variables":["variable_name"]}}'
 
 description = f'''
-Gives contact information on nearest Small Business Development Agency / SBA / Small Business Administrations /
+Gives contact information on nearest help for Small Business Development Agency / SBA / Small Business Administrations /
 Small Business Development Agency affiliated with the SBA."
-Input must be valid home address from the user or an address provided to be checked for nearest facility.
+Input must be valid home address from the user or an address provided to be checked for nearest facility from memory.
 The address should abide by the standard of  United States of America.
 If you don't know the value to be assigned to a key, omit the key.
 Output must be valid JSON in the following format: {output_format}. 
