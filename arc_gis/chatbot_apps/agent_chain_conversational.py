@@ -23,7 +23,7 @@ def parse_args():
                         help="Directly ask agent chain a question")
     return parser.parse_args()
 
-def setup_agent_chain(neo4j_db:Neo4jDatabase, sql_db:SQLDatabase):
+def setup_agent_chain(neo4j_db:Neo4jDatabase):
     # from tools_agent import agent
     from location_recommendation_tool import LocationRecommendation
     from load_registrant_tool import LoadRegistrant
