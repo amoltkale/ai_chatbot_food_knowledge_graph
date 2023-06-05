@@ -12,8 +12,8 @@ from llama_index.prompts.prompts import QuestionAnswerPrompt, RefinePrompt
 from llama_index.prompts.default_prompts import DEFAULT_TEXT_QA_PROMPT_TMPL, DEFAULT_REFINE_PROMPT_TMPL
 from langchain.document_loaders import GoogleDriveLoader
 
-sys.path.append('../../')
-from utils import get_config
+sys.path.append('../')
+from utils import get_config, bcolors, print_in_color
 from llm_utils import get_gpt_4_openai_llm
 
 os.environ['OPENAI_API_KEY'] = get_config("open_ai","key")
@@ -82,9 +82,8 @@ def read_llm_index(*, index_storage_folder:Path):
 def create_all_doc_indexes():
     import time
     from datetime import timedelta
-    from utils import bcolors, print_in_color
     # SBA
-    resource_path = Path("../resources")
+    resource_path = Path("../arc_gis/resources")
     start = time.process_time()
     create_gdrive_index(folder_id="1PwdIP7WCHrr3LNDHUAs0aU5B0hPmyQJg", index_storage_folder=resource_path / "sba_doc_indexes")
     end = time.process_time()
@@ -105,7 +104,7 @@ if __name__ == '__main__':
     # logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     # logging.getLogger().addHandler(logging.StreamHandler(stream=sys.stdout))
 
-    # resource_path = Path("../resources")
+    # resource_path = Path("../arc_gis/resources")
     # index_storage_folder = resource_path / "indexes"
     # index_storage_folder.mkdir(exist_ok=True)
 
@@ -125,7 +124,7 @@ if __name__ == '__main__':
     #         I have less than 40 employees. What loans do I qualify for?
     #      """
     # else:
-    #     # create_rdf_index(file_p=Path("../resources/financial-ontology.rdf"), index_storage_folder=index_storage_folder)
+    #     # create_rdf_index(file_p=Path("../arc_gis/resources/financial-ontology.rdf"), index_storage_folder=index_storage_folder)
     #     # raise NotImplementedError
     #     index = read_llm_index(index_storage_folder=index_storage_folder)
     #     response_schemas = [

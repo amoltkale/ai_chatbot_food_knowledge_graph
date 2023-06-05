@@ -13,10 +13,10 @@ import flask
 from langchain.callbacks import get_openai_callback
 
 # import to read configs
-sys.path.append('../../')
+sys.path.append('../')
 from utils import get_config
 
-from load_registrant import get_welcome_prompt, set_enviro_email
+from chatbot_apps.load_registrant import get_welcome_prompt, set_enviro_email
 
 # set up response style
 recieved_style={

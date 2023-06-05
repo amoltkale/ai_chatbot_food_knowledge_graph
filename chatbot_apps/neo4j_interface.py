@@ -19,7 +19,7 @@ from neo4j_database import Neo4jDatabase
 
 import sys
 # import to read configs
-sys.path.append('../../../../')
+sys.path.append('../')
 from utils import get_postgres_db_obj, print_in_color, bcolors
 
 class BaseNeo4jDatabaseTool(BaseModel):

@@ -1,7 +1,7 @@
 import sys
 import os
 
-sys.path.append('../../')
+sys.path.append('../')
 from utils import get_config
 
 from langchain.agents import initialize_agent

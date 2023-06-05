@@ -8,7 +8,7 @@ from load_registrant import get_welcome_prompt, set_enviro_email, user_menu
 from neo4j_database import Neo4jDatabase
 
 # import to read configs
-sys.path.append('../../../../')
+sys.path.append('../')
 from utils import bcolors, print_in_color, get_postgres_db_obj
 
 from llm_utils import get_default_openai_llm
@@ -74,7 +74,6 @@ if __name__ == '__main__':
         while True:
             question = input("Question: ")
             if question == 'bye':
-                db.close_session()
                 break
             print_in_color(f"Question: {question}", bcolors.YELLOW)
             with get_openai_callback() as cb:

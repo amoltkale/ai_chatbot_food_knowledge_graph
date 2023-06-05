@@ -13,7 +13,7 @@ index can then be filtered before LLM is queried using node preprocessor and tag
 Things that should be filtered: Specific state vs federal
 '''
 
-resource_path = Path("../resources")
+resource_path = Path("../arc_gis/resources")
 index_storage_folder = resource_path / "sba_doc_indexes"
 
 index = read_llm_index(index_storage_folder=index_storage_folder)

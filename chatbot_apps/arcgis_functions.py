@@ -14,10 +14,10 @@ from llm_utils import get_bot_response
 import pandas as pd
 
 import sys
-sys.path.append('../../')
+sys.path.append('../')
 from utils import get_config, get_gis_context
 
-sys.path.append('../')
+sys.path.append('../arc_gis/')
 from gis_resources import SD_BLOCK_GROUP_OPPORTUNITY_SCORE_LAYER, SBA_FEATURE_LAYER
 
 

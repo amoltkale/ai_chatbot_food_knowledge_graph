@@ -11,7 +11,7 @@ from arcgis.geocoding import geocode
 from arcgis.features import FeatureLayer
 
 import sys
-sys.path.append('../../')
+sys.path.append('../')
 from utils import get_gis_context
 
 gis = get_gis_context()

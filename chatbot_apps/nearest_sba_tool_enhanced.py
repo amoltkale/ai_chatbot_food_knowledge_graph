@@ -9,10 +9,10 @@ from arcgis.features import FeatureLayer
 
 # import to read configs
 import sys
-sys.path.append('../../../../')
+sys.path.append('../')
 from utils import get_gis_context
 
-sys.path.append('../../')
+sys.path.append('../arc_gis/')
 from gis_resources import SBA_FEATURE_LAYER
 
 

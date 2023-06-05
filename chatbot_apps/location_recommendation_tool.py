@@ -11,7 +11,7 @@ from arcgis_functions import  get_block_group_map_with_opp_comp_score
 
 # import to read configs
 import sys
-sys.path.append('../../../../')
+sys.path.append('../')
 from utils import get_gis_context
 
 

@@ -2,7 +2,7 @@ from typing import List, Optional, Tuple, Dict
 
 from neo4j import GraphDatabase, Result
 import sys
-sys.path.append('../../')
+sys.path.append('../')
 from utils import get_config
 
 class Neo4jDatabase:

@@ -5,7 +5,7 @@ import psycopg2
 
 import pandas as pd
 
-sys.path.append('../../')
+sys.path.append('../')
 from utils import get_config
 
 def verify_user(email:str) -> bool:

@@ -8,7 +8,7 @@ from langchain.callbacks import get_openai_callback
 
 
 import sys
-sys.path.append('../../')
+sys.path.append('../')
 from utils import get_config
 
 # To get relevant LLM(s)

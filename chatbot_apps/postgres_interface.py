@@ -10,7 +10,7 @@ from langchain.callbacks.manager import (
 )
 import sys
 
-sys.path.append('../../')
+sys.path.append('../')
 from utils import get_config
 from llm_utils import get_default_openai_llm
 
