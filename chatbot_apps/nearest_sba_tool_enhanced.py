@@ -33,7 +33,7 @@ output_format = '{{"nearest_facility":"facility_address","facility_name":"facili
 description = f'''
 Gives contact information on nearest help for Small Business Development Agency / SBA / Small Business Administrations /
 Small Business Development Agency affiliated with the SBA."
-Input must be valid home address from the user or an address provided to be checked for nearest facility from memory.
+Input must be valid home address with at least street name and state from the user or an address provided to be checked for nearest facility from memory.
 Output must be valid JSON in the following format: {output_format}. 
 Try to refer Small Business Development Agency instead of SBA while responding.
 '''

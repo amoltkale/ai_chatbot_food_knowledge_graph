@@ -63,11 +63,11 @@ def get_welcome_prompt():
     #             Here is the business profile in json format: {profile}
     #          """
     prompt = f"""
-                State the speaker's business and intended use of the funding in one sentence. 
-                There is no need to understand their business profile and funding needs right now. 
+                Welcome the speaker with a one sentence summary of their business profile and funding needs. 
                 Please treat the person as if you are directly talking with them.
                 Make your response professional, friendly, and concise.
-                Do not inform the users about the using the tools directly.
+                Do not inform the users about the using the tools directly. 
+                Do not return your thoughts for any tools.
                 End by asking "How can I help you"?
                 Here is general information on the person you are talking to: {{{user_profile}}}
                 Here is the business profile in json format: {{{biz_profile}}}
