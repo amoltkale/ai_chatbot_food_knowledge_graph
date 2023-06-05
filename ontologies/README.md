@@ -1,7 +1,38 @@
 # onto_parser
 To run: `python onto_parser.py --in_path <path to owl file>`
+    * If given a file, it will only convert that file
+    * If given a directory, it will convert all `*.owl` files
+    * This will output the following files:
+        * `<*>_nodes.csv`
+        * `<*>_rels.csv`
 
-## How it works
+# neo4j
+1. Add `<*>_nodes.csv`, `<*>_rels.csv` to the `import` directory in the neo4j project
+2. Run the import command below to load `<*>_nodes` and `<*>_rels` into the database
+3. Then run the queries to add annotations
+
+## import
+```bash
+./bin/neo4j-admin database import full --trim-strings=true neo4j \
+--overwrite-destination --nodes=import/<*>_nodes.csv \
+--relationships=import/<*>_rels.csv
+```
+
+## create full text index
+**This is needed to get food alternatives in the chatbot**
+```
+CREATE FULLTEXT INDEX label_index
+FOR (n:Concept)
+ON EACH [n.label]
+OPTIONS {
+  indexConfig: {
+    `fulltext.analyzer`: 'english',
+    `fulltext.eventually_consistent`: true
+  }
+}
+```
+
+## How it works (High level psuedo code)
 load ontology
 get all entities (ontology.classes())
 for each entity
@@ -35,7 +66,7 @@ def parser (recursive function)
             for each clause in unknown_class<OneOf> (.instances)
                 call parser(clause, ONEOF_transition)
         case primitive type
-            # track premature node ends)
+            # track premature node ends
 
 ### post emit fixes
 remove duplicate nodes (pandas drop_duplicates)
@@ -45,46 +76,3 @@ check node list generated from primitive type match
             # drop transition node relation in dataframe
             # drop node from node dataframe
 write out cleaned csv
-
-# neo4j
-1. Add `nodes.csv`, `rels.csv`, and `annots.csv` to the `import` directory in the neo4j project
-2. Run the import command below to load `nodes` and `rels` into the database
-3. Then run the queries to add annotations
-
-## import
-```bash
-./bin/neo4j-admin database import full --trim-strings=true neo4j \
---overwrite-destination --nodes=import/nodes.csv \
---relationships=import/rels.csv
-```
-
-## Add annotations
-### Create index
-```sql
-CREATE TEXT INDEX node_index
-FOR (n:Concept)
-ON (n.node_id)
-```
-
-### Add annotations (this takes roughly an hour)
-```sql
-LOAD CSV WITH HEADERS FROM 'file:///annot.csv' AS row
-MATCH (n:Concept {node_id: row.node_id})
-WITH n, row
-CALL apoc.create.setProperty(n, row.annot_label, [x in apoc.text.split(row.annot, '###')])
-YIELD node
-RETURN COUNT(*)
-```
-
-## create full text index
-```
-CREATE FULLTEXT INDEX label_index
-FOR (n:Concept)
-ON EACH [n.descriptive_label]
-OPTIONS {
-  indexConfig: {
-    `fulltext.analyzer`: 'english',
-    `fulltext.eventually_consistent`: true
-  }
-}
-```
