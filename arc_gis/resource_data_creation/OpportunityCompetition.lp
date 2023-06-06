@@ -1,16 +1,15 @@
-\* Opportunity_/_Competition_Problem *\
+\* Opportunity_Problem *\
 Maximize
-Objective_Function: - 0.15 Affordability + 0.2 Competition
- + 0.05 DiversityIndex + 0.2 FootTraffic + 0.1 Opportunity
- + 0.15 PopDensitySquareMile - 0.15 ProximityToCommercial
+OBJ: affordability - competition - crime + demographics + foot_traffic
+ + growth_potential + opportunity + population_density
 Subject To
-test: DiversityIndex >= 0.25
 Bounds
- Affordability <= 1
- Competition <= 1
- 0.25 <= DiversityIndex <= 1
- FootTraffic <= 1
- Opportunity <= 1
- PopDensitySquareMile <= 1
- 0.01 <= ProximityToCommercial <= 1
+ -1.56670073924 <= affordability <= 4
+ -0.980441954521 <= competition <= 4
+ -1.37023017469 <= crime <= 4
+ -4 <= demographics <= 1.3913074319
+ -0.471764129405 <= foot_traffic <= 4
+ -4 <= growth_potential <= 0.934502483384
+ -4 <= opportunity <= 2.23038797168
+ -1.06603740858 <= population_density <= 4
 End

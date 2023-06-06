@@ -1,10 +1,40 @@
-WITH store_names AS
-    (SELECT DISTINCT name AS dist_names
-     FROM ca_business WHERE ('Fast food restaurant' = any(categories) OR 'Bar' = any(categories) OR 'Pizza restaurant' = any(categories) OR 'Hamburger restaurant' = any(categories) OR 'Convenience store' = any(categories) OR 'Liquor store' = any(categories) OR 'Ice cream shop' = any(categories) OR 'Dessert shop' = any(categories) OR 'Pizza delivery' = any(categories) OR 'Bar & grill' = any(categories) OR 'Pizza Takeout' = any(categories) OR 'Chicken wings restaurant' = any(categories) OR 'Donut shop' = any(categories) OR 'Cocktail bar' = any(categories) OR 'Wine bar' = any(categories) OR 'Wine store' = any(categories) OR 'Sports bar' = any(categories) OR 'Brewery' = any(categories) OR 'Beer store' = any(categories) OR 'Candy store' = any(categories) OR 'Dessert restaurant' = any(categories) OR 'Chocolate shop' = any(categories) OR 'Hot dog restaurant' = any(categories) OR 'Brewpub' = any(categories) OR 'Pastry shop' = any(categories) OR 'Beer garden' = any(categories) OR 'Cookie shop' = any(categories) OR 'Fried chicken takeaway' = any(categories) OR 'Hot dog stand' = any(categories) OR 'Beer hall' = any(categories) OR 'Crêperie' = any(categories) OR 'Irish pub' = any(categories) OR 'Pie shop' = any(categories) OR 'Cupcake shop' = any(categories) OR 'Gay bar' = any(categories) OR 'Patisserie' = any(categories) OR 'Cider bar' = any(categories) OR 'Popcorn store' = any(categories) OR 'Confectionery' = any(categories) OR 'Chocolate artisan' = any(categories) OR 'Hong Kong style fast food restaurant' = any(categories) OR 'Pizza takeaway' = any(categories) OR 'Piano bar' = any(categories) OR 'Sweets and dessert buffet' = any(categories) OR 'Chocolate cafe' = any(categories) OR 'Dart bar' = any(categories) OR 'Tiki bar' = any(categories) OR 'State liquor store' = any(categories) OR 'Pizza' = any(categories) OR 'Sake brewery' = any(categories) OR 'Liquor wholesaler' = any(categories) OR 'Japanese confectionery shop' = any(categories) OR 'Japanese sweets restaurant' = any(categories) OR 'Confectionery wholesaler' = any(categories) OR 'Indian sweets shop' = any(categories) OR 'Japanese cheap sweets shop' = any(categories) OR 'Shochu brewery' = any(categories))
-    ),
-    hpf_stores AS
-        (SELECT * FROM ca_business INNER JOIN store_names ON ca_business.name = store_names.dist_names
-        )
-SELECT COUNT(*) as count, array_agg(distinct name) as restaurants
-FROM hpf_stores
-WHERE name NOT IN (SELECT DISTINCT name FROM ca_business WHERE ('Supermarket' = any(categories)));
+DROP MATERIALIZED VIEW IF EXISTS avg_hpf_scores;
+DROP MATERIALIZED VIEW IF EXISTS lexmapr_iri;
+
+CREATE  MATERIALIZED VIEW  lexmapr_iri as SELECT fdc_id, "Product_Desc" as product_desc, "Matched_Components" as matched_components, "Match_Status" as match_status,
+       case when "Match_Status" = 'Full Term Match' then 1 else 0 end as match_id,
+       unnest(regexp_matches("Matched_Components", '(?<=:)(.*?)(?=,\s|$)', 'g')) as component_iri
+FROM "LexMaprMapping_Products";
+
+alter materialized view lexmapr_iri owner to nourish;
+
+CREATE MATERIALIZED VIEW  avg_hpf_scores as SELECT
+    fdc_list.matched_components,
+    COUNT(matched_components) AS n,
+    AVG(case when fsod = 'True' then 1 else 0 end +
+    case when fs = 'True' then 1 else 0 end +
+    case when csod = 'True' then 1 else 0 end) AS hpf_score
+FROM usda_2022_hpf_component as hpf inner join lexmapr_iri As fdc_list
+    ON fdc_list.fdc_id = hpf.fdc_id
+GROUP BY matched_components
+ORDER BY hpf_score;
+
+alter materialized view avg_hpf_scores owner to nourish;
+
+-- Hot dog query example
+WITH fdc_list as
+    (SELECT DISTINCT fdc_id, matched_components, product_desc
+    FROM lexmapr_iri
+--     WHERE match_status = 'Full Term Match' AND
+    WHERE match_id = 1 AND
+        component_iri = any(array['FOODON_00001009','FOODON_03302012','FOODON_03311509','FOODON_03310934','FOODON_03310577','FOODON_03310576','FOODON_03310165','FOODON_03310164','FOODON_03310163','FOODON_03310162','FOODON_03307230','FOODON_00001605','FOODON_00004095','FOODON_00003924','FOODON_00003288','FOODON_00003890','FOODON_00001224']))
+, hpf_fdc_list AS (SELECT DISTINCT ON (fdc_list.matched_components)
+    fdc_list.matched_components,
+    fdc_list.product_desc,
+    hpf.n,
+    hpf.hpf_score
+FROM fdc_list INNER JOIN avg_hpf_scores as hpf
+    ON fdc_list.matched_components = hpf.matched_components)
+SELECT ROW_NUMBER() OVER (ORDER BY hpf_score ASC) AS rank, *
+From hpf_fdc_list
+ORDER BY rank;

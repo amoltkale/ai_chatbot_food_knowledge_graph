@@ -1,43 +1,21 @@
-# ARC_GIS / ESRI Geo-Enrichment
-
-`config.ini` should be maintained with configurations in arcgis folder.
-
-### Code Execution Details
-`enrich_subgepgraphies.ipynb` is the python notebook used to create geo-enrichment files for :  
-1. `San Diego County`  
-2. `Imperial County`  
-  
-### Some important Links 
-
-##### `Data Browser for Analysis Variables in ARC GIS`  
-https://doc.arcgis.com/en/esri-demographics/latest/data-browser/data-browser.htm
+# ARC_GIS 
+All the feature layers and maps created on UCSD ArcGIS Online can be access on the public group caller `project_nourish_public`:
+[project_nourish_public](https://arcg.is/1nSziL0)
 
 
-##### `Esri U.S. data fact sheet`
-https://doc.arcgis.com/en/esri-demographics/latest/get-started/us-data-fact-sheet.htm  
+### Folder Structure for arc_gis And the content description.
+```
+├── enrichment
+├── feature_layers  #This dir. contains all the code associated with creating and publishing feature layer creation on AGOL.
+│   ├── TEST 
+│   ├── boundaries   # Feature layers for creating boundaries of geographies.
+│   ├── business_data    # Feature layers for business related GIS data.
+│   └── san_diego_hunger_coalition  # Feature layers for CalFresh Food insecurity data.
+├── location_questions_answers  #This dir contains exploratory code to query feature layers.
+├── publish_items   #This dir contains exploratory code to publish items on AGOL
+├── queries    # Queries for Conversational AI.
+├── resource_data_creation #This dir. contains all the code through which some important resouce artifacts are created.
+├── resources   #This dir. contains all important resource file used in arcgis and conversational AI code.
+└── subgeographies  # This dir. contains exploratory code to check all the subgeographies like census block groups, tracts etc.
+```
 
-
-##### `Cenpy API documentation`
-https://nbviewer.org/github/cenpy-devs/cenpy/blob/master/notebooks/product-api.ipynb  
-
-
-##### `Found this link while searching for some code variable to get cenpy data`
-https://geographicdata.science/book/data/sandiego/sandiego_tracts_cleaning.html  
-
-##### `Arc GIS Geography Standard levels`
-https://geoenrichdev.arcgis.com/arcgis/rest/services/World/GeoenrichmentServer/Geoenrichment/StandardGeographyLevels  
-
-##### 
-
-
-
-
-#### `Geocoding`
-##### `Listing `
-https://developers.arcgis.com/python/guide/part1-what-is-geocoding/#what-are-geocoders-and-their-types  
-`categories property`  
-The categories property can be used to limit result to one or more categories. For example, "Populated Place" or "Scandinavian Food". It is only applicable to the World Geocoding Service. The following code lists the entire hierarchy of supported category values.
-
-
-## Found Sample notebooks
-https://github.com/Esri/arcgis-python-api  

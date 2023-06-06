@@ -1,3 +1,5 @@
+import warnings
+
 from pathlib import Path
 
 import csv
@@ -6,6 +8,17 @@ import pickle
 import psycopg2
 
 from arcgis.geocoding import geocode
+from arcgis.features import FeatureLayer
+
+import sys
+sys.path.append('../')
+from utils import get_gis_context
+
+gis = get_gis_context()
+SD_BLOCK_GROUP_OPPORTUNITY_SCORE_LAYER = FeatureLayer(url="https://services1.arcgis.com/eGSDp8lpKe5izqVc/arcgis/rest/services/a1d691/FeatureServer/0")
+SBA_FEATURE_LAYER = FeatureLayer(gis= gis, url = "https://services1.arcgis.com/eGSDp8lpKe5izqVc/arcgis/rest/services/a8d231/FeatureServer/0")
+SANDAG_MGRA_FEATURE_LAYER = FeatureLayer(gis=gis, url="https://services1.arcgis.com/eGSDp8lpKe5izqVc/arcgis/rest/services/SANDAG_MGRA13/FeatureServer/0")
+
 
 def san_diego_county_zips():
     '''
@@ -34,6 +47,9 @@ def read_exact_unhealthy_food_biz_categories():
     return res
 
 def create_where_clause(in_list):
+    '''
+    This is only applicable for ca_business table from postgresSQL nourish db
+    '''
     qry_where_list = []
     for c in in_list:
 
@@ -79,3 +95,18 @@ def execute_sql(conn, qry):
     cur.close()
     
     return res
+
+def create_feature_layer(gis, sdf, title, tags, folder='nourish_gis'):
+    items = gis.content.search(query="title:'{}' AND type:'Feature Service'".format(title))
+    if len(items) > 0 and items[0].owner=='akale_UCSD':
+        warnings.warn("Feature Layer already exists with title {}".format(title), category=UserWarning)
+        lyr = items[0].layers[0]
+        return lyr
+    else:
+        # Convert back from a SEDF into a feature layer, and publishing on AGOL
+        my_new_featurelayer = sdf.spatial.to_featurelayer(title=title, 
+                                                                 gis=gis, 
+                                                                 folder='nourish_gis',
+                                                                 tags=tags)
+        lyr = my_new_featurelayer.layers[0]
+        return lyr
