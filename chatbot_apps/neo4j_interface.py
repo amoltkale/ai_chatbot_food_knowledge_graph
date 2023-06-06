@@ -71,10 +71,9 @@ class RelatedFoodIRIListTool(BaseNeo4jDatabaseTool, BaseTool):
     name = 'ranked_food_list'
     description = f'''
     Helps give markdown table for top 3 food items ranked foods according to ranks and another markdown table for bottom 3 ranked foods according to ranks by using output from related_food_iri_name_list tool.
-    This tool is used if asked for related or alternative food items. Utilize the thought and observation.
-    
+    This tool is used if asked for related or alternative food items. Utilize the thought and observation.    
     Input should be a food type.
-    Output would be top 3 food items ranked foods according to ranks and another markdown table for bottom 3 ranked foods according to ranks. Additionally mention the count of related ranked food items from the initial output.
+    Output would be top 3 food items ranked foods according to ranks and another markdown table for bottom 3 ranked foods according to ranks. 
     Output format should be as below : "
     Here is a list of related food items to foot type. The results have been scored based off the percentage of carbohydrates, fats, sugar and sodium.
     Three best food alternatives according to our scores:
@@ -85,7 +84,10 @@ class RelatedFoodIRIListTool(BaseNeo4jDatabaseTool, BaseTool):
     Three worst alternatives according to our scores:
     * food item1
     * food item2
-    * food item3"
+    * food item3
+    
+    We found <count> total food items as alternatives to the <food_type>.
+    "
     '''
     return_direct = False
     def _run(
