@@ -13,3 +13,8 @@
     cursor:pointer;
 
 }
+.bg_home {
+    background: url("../images/bg_home.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+  }

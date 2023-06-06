@@ -9,14 +9,18 @@ body{
 }
 
 :root {
-    --brand-color: darkolivegreen;
+    --brand-color: periwinkle;
   }
   
   body {
     margin: 1;
-    background-color: AntiqueWhite;
-  /*   background: url("https://assets.codepen.io/373707/pexels-engin-akyurt-3368291.jpg");
-    background-blend-mode: multiply; */
+    /* background-color: AntiqueWhite; */
+     background: url("/images/background_form.jpg");
+     background-repeat: no-repeat;
+     background-position: bottom right -50px;
+     background-size: 30vw;
+     background-attachment: fixed;
+   
   }
   
   * {
@@ -31,10 +35,12 @@ body{
     display: flex;
     gap: 2rem;
     flex-direction: row;
-    max-width: 90rem;
     margin: 0 auto;
     padding: 5rem 0;
     box-sizing: border-box;
+  }
+  .container img {
+    max-width: 75%;
   }
   
   .column {
@@ -71,26 +77,93 @@ body{
   }
   
    .btn {
-    background-color: var(--brand-color);
+    background-color: white;
     padding: 1rem;
     border-radius: 2rem;
-    color: white;
+    margin-right: 5px;
+    color: black;
     box-sizing: border-box;
     display: inline-block;
     text-decoration: none;
   }
   
   .right-section {
-    background: url("https://assets.codepen.io/373707/pexels-wendy-wei-1656663.jpg");
-    background-size: contain;
-    background-repeat: no-repeat;
+   display: flex;
+   justify-content: center;
+   gap: 2rdm;
+   align-items: flex-start;
   }
   
-  @media (max-width: 1300px) {
-    .right-section {
-      display: none;
-    }
+  
+    
+   
     .left-section {
       text-align: center;
     }
+  
+  .form-container {
+    width: 35vw;
+    display: flex;
+    flex-direction: column;
+    gap: 1em !important;
+    margin: 0 auto;
+  }
+  
+  .input-group {
+    display: flex;
+  }
+  
+  .input-label {
+    width: 12.5rem;
+  }
+  
+  .input-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 .35em;
+    background-color: grey;
+    color: white;
+  }
+  
+  .input-wrapper {
+    display: flex;
+    flex-grow: 1;
+    border: 1px solid grey;
+    border-radius: 15px;
+    overflow: hidden;
+  }
+  
+  .input {
+    flex-grow: 1;
+    border: none;
+    padding: .25em;
+  }
+  
+  .flex-grow {
+    flex-grow: 1;
+  }
+  
+  .flex-column {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35em;
+  }
+
+  .main-nav{
+    padding: 0.5rem;
+    display: flex;
+    justify-content: right;
+    background-color: teal;
+  }
+
+  .main-nav a {
+    text-decoration: none;
+    color: white;
+    padding: 0.25em;
+    border-radius: 5px;
+  }
+
+  .main-nav a:hover{
+    background-color: blue;
   }

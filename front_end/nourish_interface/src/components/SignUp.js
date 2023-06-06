@@ -1,7 +1,7 @@
 /* Collecting information 
 from the user for the onboarding process */
 import { useCallback, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link} from "react-router-dom"
 import { classes } from "../util"
 import EmailInput from "./EmailInput"
 import CheckListInput from "./CheckListInput"
@@ -12,13 +12,15 @@ import ListInput from "./ListInput"
 import SelectInput from "./SelectInput"
 import NumberInput from "./NumberInput"
 import BooleanInput from "./BooleanInput"
+import logo from "../images/Logo_black.PNG"
+
 /* Default function - Takes us to each sub-page for the sign up process */
 export default function SignUp() {
     const [aboutMeData, setAboutMeData] = useState(null)
     //const [projectData, setProjectData] = useState(null)
     async function addFinalData(data) {
 
-        const response = await fetch('/test', {
+        const response = await fetch('/api/user/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -37,10 +39,14 @@ export default function SignUp() {
         return <AboutMyProject onSubmit={addFinalData} />
     }
     return <>
-        <h1 className="small-blurb">Nourish Project</h1>
-        <h2 className="small-blurb">Entrepreneur Signup</h2>
+    <nav className="main-nav">
+        <Link to="/">HOME</Link>
+       
+    </nav> 
+        <div>
+          <img className="img-logo" src={logo}/>
 
-
+          </div>
         {pageContent()}
     </>
 }
@@ -87,7 +93,7 @@ function AboutMyProject({ onSubmit }) {
 
     return <form onSubmit={handleSubmit}>
         {/* <div style={{ display: "flex", flexDirection: "column" }}> */}
-        <div className={styles["form-container"]}>
+        <div className="form-container flex-column">
             <BooleanInput label="Is this an existing business?" name="extending_existing_business" onChange={updateData} data={data} />
 
             {/* Existing Business */}
@@ -193,8 +199,6 @@ function AboutMe({ onSubmit }) {
         middle_name: "",
         last_name: "",
         home_street_address: "",
-        primary_email: "",
-        password: "",
         email: [""],
         phone: [""],
         gender: "",
@@ -265,17 +269,15 @@ function AboutMe({ onSubmit }) {
 
     return <form onSubmit={handleSubmit}>
 
-        <div className={styles["form-container"]}>
+        <div className="form-container flex-column">
             {/* <div>*indicates required field</div> */}
             <TextInput autoFocus icon="bi-person" data={data} errors={errors} name="first_name" label="First Name" onChange={updateData} className={classes(styles.grow, styles.row)} />
             <TextInput icon="bi-person" data={data} errors={errors} name="middle_name" label="Middle Name" onChange={updateData} className={classes(styles.grow, styles.row)} />
             <TextInput icon="bi-person" data={data} errors={errors} name="last_name" label="Last Name" onChange={updateData} className={classes(styles.grow, styles.row)} />
             <TextInput icon="bi-map" label="Home Address" data={data} errors={errors} name="home_street_address" onChange={updateData} />
-            <EmailInput icon="bi-envelope" label="Primary Email" data={data} errors={errors} name="primary_email" onChange={updateData} />
-            <TextInput type="password" icon="bi-lock-fill" label="Password" data={data} errors={errors} name="password" onChange={updateData} />
             <ListInput icon="bi-envelope" type="email" name="email" label="Email" onChange={updateDataDirect} />
             <ListInput icon="bi-phone" type="tel" name="phone" label="Phone" onChange={updateDataDirect} />
-            <CheckListInput name="ethnicity" label="Ethnicity" options={ethnicities} onChange={updateDataDirect} />
+            <CheckListInput styles="input-list-wrapper" name="ethnicity" label="Ethnicity" options={ethnicities} onChange={updateDataDirect} />
             <CheckListInput name="languages_spoken" label="Languages you speak" options={languages} onChange={updateDataDirect} />
             <CheckListInput name="languages_written" label="Languages you write in" options={languages} onChange={updateDataDirect} />
             <BooleanInput label="Are You a Veteran?" name="is_veteran" onChange={updateData} data={data} />

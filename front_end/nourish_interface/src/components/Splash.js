@@ -1,8 +1,9 @@
 /* Respoinsible for welcoming user to the site and directing them to the onboarding process (sign-up) */
 
 import { Link } from "react-router-dom"
-// import { classes } from "../util"
-// import styles from "./Splash.module.css"
+import { classes } from "../util"
+import styles from "./Splash.module.css"
+import logo from "../images/logo_white.PNG"
 
 // export default function Splash(){
 //     const navigate=useNavigate()
@@ -18,18 +19,19 @@ import { Link } from "react-router-dom"
 //     </div>
 // }
 export default function Splash() {
-    return <div className="container">
-        <div className="column main-section left-section">
-            <div className="big-blurb">Welcome to the Nourish Project</div>
-            <div>We gather information from various sources to provide an innovative information source for entrepreneurs, organizations, businesses, and anyone interested in learning the business of healthy food.</div>
-            <div>
-                <Link to="/signup" className="btn">Sign Up</Link>
-            </div>
-            <div>
-                <div>Already a member?</div>
-                <Link to="/signup" className="btn">Sign In</Link>
-            </div>
+    return <div className={classes("container",styles.bg_home)}>
+        <div className="main-section left-section">
+            
+                <img  src={logo}/>
+           
+            
         </div>
-        <div className="column main-section right-section"></div>
+        <div className="main-section right-section">
+       
+                <Link to="/signup" className="btn">Sign Up</Link>
+                
+                <Link to="/signin" className="btn">Sign In</Link>
+            
+        </div>
     </div>
 }

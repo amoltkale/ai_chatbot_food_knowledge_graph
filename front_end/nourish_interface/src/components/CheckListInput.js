@@ -29,38 +29,34 @@ export default function CheckListInput({label, options, onChange, name}) {
             })
         }
     }
-    return <label className={styles["input-group"]}>
-      <span className={styles["input-label"]}>{label}</span>
+    return <label className={"input-group"}>
+      <span className={"input-label"}>{label}</span>
       <div
-        className={classes(
-          styles["input-wrapper"],
-          styles["column"],
-          styles["gap-s"]
-        )}
+        className="flex-column flex-grow"
       >
          {options.map((option) => {
             return <label key={option}>
-                <input type="checkbox" onClick={toggleOption} checked={selectedOptions.includes(option)} name={option} />
+                <input className="input" type="checkbox" onClick={toggleOption} checked={selectedOptions.includes(option)} name={option} />
                 <span>{option}</span>
             </label>
         })}
         
         
-        {selectedOptions.includes("Other") && <div className={styles["input-wrapper"]}>
-          <i className={classes("bi-three-dots", styles["input-icon"])}></i>
-          <input className={styles["input"]}  />
+        {selectedOptions.includes("Other") && <div className="input-wrapper">
+          <i className={classes("bi-three-dots", "input-icon")}></i>
+          <input className={"input"}  />
         </div>}
       </div>
     </label>
-    return <div className={styles.column}>
-        <label >{label}</label>
-        {options.map((option) => {
-            return <label key={option}>
-                <input type="checkbox" onClick={toggleOption} checked={selectedOptions.includes(option)} name={option} />
-                {option}
-            </label>
-        })}
-        {selectedOptions.includes("Other") && <input value={otherOption}  onChange={(e)=>{setOtherOption(e.target.value)}} />}
-        {/* <span>{errors.selectedEthnicities}</span> */}
-    </div>
+    // <label class="input-group">
+    //   <span class="input-label">{label}</span>
+    //   <div class="flex-column flex-grow">
+    //     {vals.map((e) => (
+    //       <div>
+    //         <input class="input" type="checkbox" />
+    //         {e}
+    //       </div>
+    //     ))}
+    //   </div>
+    // </label>
 }
