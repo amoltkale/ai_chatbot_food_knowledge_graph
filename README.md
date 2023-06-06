@@ -5,6 +5,7 @@ The code currently has a few different set of code related to different parts of
 2. Owl file conversion to neo4j-admin ready import
 3. Nutitrional clustering
 4. Frontend javascript that creates the login for users and queries them for information
+5. GIS Related Code using ArcGIS Online. Readme can be found at `arc_gis/README.md`
 
 However, this README will focus on the main product: the chatbot application.
 
@@ -25,7 +26,9 @@ If you would like to directly connect to Nourish, you will need to contact Dr. A
         * These keys are only needed if you want to create new document indexes for LLM to use
             * If you run `python chatbot_apps/index_creation.py` and update the google drive folders in the file, it will automatically update the index files in `arcgis/resources/`
             * Currently only the SBA indexes are being used
-    * Arcgis Online account info to pull maps
+    * Arcgis Online account info to pull feature layers and maps
+        * [UCSD ArcGIS Online](https://ucsdonline.maps.arcgis.com/)
+        * Nourish Project Resource Group - [project_nourish_public](https://arcg.is/1nSziL0)
     * Nourish database, particularly the tables below are used:
         * [Branded Foods and nutrition 10/2022](https://fdc.nal.usda.gov/download-datasets.html)
         * A table made from running [Lexmapr](https://github.com/cidgoh/LexMapr) to map branded foods to Foodon ontology
