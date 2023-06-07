@@ -1,0 +1,138 @@
+body {
+    margin: 0;
+    /* background-color: beige; */
+   
+  }
+
+  .form-style-4{
+    /* width: 400px;
+    font-size: 16px;
+    background: #495C70;
+    padding: 30px 30px 15px 30px;
+    border: 5px solid #53687E; */
+    width: 400px;
+    font-size: 16px;
+    background: #495C70;
+    padding: 5px 5px 15px 60px;
+    border: 5px solid #53687E;
+  }
+  .form-style-4 input[type=submit],
+  .form-style-4 input[type=button],
+  .form-style-4 input[type=text],
+  .form-style-4 input[type=email],
+  .form-style-4 textarea,
+  .form-style-4 label
+  {
+    font-family: Georgia, "Times New Roman", Times, serif;
+    font-size: 16px;
+    color: #fff;
+  
+  }
+  .form-style-4 label {
+    display:block;
+    margin-bottom: 10px;
+  }
+  .form-style-4 label > span{
+    display: inline-block;
+    float: left;
+    width: 150px;
+  }
+  .form-style-4 input[type=text],
+  .form-style-4 input[type=email] 
+  {
+    background: transparent;
+    border: none;
+    border-bottom: 1px dashed #83A4C5;
+    width: 275px;
+    outline: none;
+    padding: 0px 0px 0px 0px;
+    font-style: italic;
+  }
+  .form-style-4 textarea{
+    font-style: italic;
+    padding: 0px 0px 0px 0px;
+    background: transparent;
+    outline: none;
+    border: none;
+    border-bottom: 1px dashed #83A4C5;
+    width: 275px;
+    overflow: hidden;
+    resize:none;
+    height:20px;
+  }
+  
+  .form-style-4 textarea:focus, 
+  .form-style-4 input[type=text]:focus,
+  .form-style-4 input[type=email]:focus,
+  .form-style-4 input[type=email] :focus
+  {
+    border-bottom: 1px dashed #D9FFA9;
+  }
+  
+  .form-style-4 input[type=submit],
+  .form-style-4 input[type=button]{
+    background: #576E86;
+    border: none;
+    padding: 8px 10px 8px 10px;
+    border-radius: 5px;
+    color: #A8BACE;
+  }
+  .form-style-4 input[type=submit]:hover,
+  .form-style-4 input[type=button]:hover{
+  background: #394D61;
+  }
+  
+
+  
+  
+  .chatbox-container {
+    display: flex;
+    flex-direction: column;
+    width: 30rem;
+    margin: 0 auto;
+    height: calc(100vh - 1rem);
+    margin-top: 0.5rem;
+  }
+  
+  .chatbox-title {
+    background-color: transparent;
+    padding: 1.25rem;
+    border-radius: 10px 10px 0 0;
+  }
+  
+  .chatbox-messages-container {
+    flex-grow: 1;
+  }
+  
+  .chatbox-input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    align-items: stretch;
+  }
+  
+  .chatbox-buttons-container {
+    display: flex;
+    gap: 0.25rem;
+  /*   justify-content: center; */
+  }
+  
+  .chatbox-buttons-container button {
+    padding: 0.5em;
+    height: 160px;
+    width: 25%;
+    background-image: linear-gradient(to bottom right, white, tan);
+    flex-grow: 1;
+  }
+  
+  .chatbox-input-container form {
+    display: flex;
+  }
+  
+  .chatbox-input-container input {
+    flex-grow: 1;
+  }
+  
+  .chatbox-input-container form button {
+    padding: 0.5em;
+  }

@@ -1,0 +1,20 @@
+.center{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+.callout{
+    background-color:aqua;
+    color:chocolate;
+    padding:3rem;
+    border:1px rgba(0,0,0,0.3) solid;
+    border-radius:5px;
+    cursor:pointer;
+
+}
+.bg_home {
+    background: url("../images/bg_home.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
