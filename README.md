@@ -8,6 +8,9 @@ The repository is composed of a variety of scripts used to create the knowledge 
 2. Chatbot
     * Location: `chatbot_apps`
     * README: `README.md`
+    * Dependencies
+        * **PYTHON VERSION: 3.9.X**
+        * `./requirements.txt`
     * Description: Tools used to interface with Openai and knowledge graph. Code for the front facing chat application is also located here and is called `nourish_chatbot_app.py`
 3. Front End
     * Location: `front_end`
@@ -24,6 +27,9 @@ The repository is composed of a variety of scripts used to create the knowledge 
 6. Ontologies
     * Location: `ontologies`
     * README: `ontologies/README.md`
+    * Dependencies
+        * **PYTHON VERSION: 3.10.X**
+        * `ontologies/requirements.txt`
     * Description: Code used to convert owl files into neo4j ready csv files
 
 However, this README will focus on the main product: the chatbot application.
