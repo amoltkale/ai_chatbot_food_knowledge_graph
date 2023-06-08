@@ -1,15 +1,30 @@
 # Nourish Knowledge Graph Analysis Capstone
-The code currently has a few different set of code related to different parts of the application
+The repository is composed of a variety of scripts used to create the knowledge graph and integrate the knowledge graph with a LLM. On top of the integration, there is also code for a front facing website for users to log in to as well as a front end for the chat application. Please see below for more details on each directory and their contents.
 
-1. The chatbot application
-    * `README.md`
-2. Owl file conversion to neo4j-admin ready import
-    * `ontologies/README.md`
-3. Nutitrional clustering
-4. Frontend javascript that creates the login for users and queries them for information
-    * `front_end/README.md`
-5. GIS Related Code using ArcGIS Online.
-    * `arc_gis/README.md`
+1. Arcgis
+    * Location: `arc_gis`
+    * README: `arc_gis/README.md`
+    * Description: Code used to create spatial feature layers, EDA, and querying as well as geoenrichement code.
+2. Chatbot
+    * Location: `chatbot_apps`
+    * README: `README.md`
+    * Description: Tools used to interface with Openai and knowledge graph. Code for the front facing chat application is also located here and is called `nourish_chatbot_app.py`
+3. Front End
+    * Location: `front_end`
+    * README: `front_end/README.md`
+    * Description: Frontend javascript that creates the login for users and queries them for information
+4. Models
+    * LocationL `models`
+    * README: There is not a readme for the one off clustering
+    * Description: Scripts used to cluster food products by nutitrion and to calculate HPF scores
+5. Neo4j
+    * Location: `neo4j`
+    * README: None, this was preliminary EDA
+    * Description: Initial eda code to connect to neo4j server and directly update server
+6. Ontologies
+    * Location: `ontologies`
+    * README: `ontologies/README.md`
+    * Description: Code used to convert owl files into neo4j ready csv files
 
 However, this README will focus on the main product: the chatbot application.
 
