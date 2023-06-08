@@ -2,10 +2,14 @@
 The code currently has a few different set of code related to different parts of the application
 
 1. The chatbot application
+    * `README.md`
 2. Owl file conversion to neo4j-admin ready import
+    * `ontologies/README.md`
 3. Nutitrional clustering
 4. Frontend javascript that creates the login for users and queries them for information
-5. GIS Related Code using ArcGIS Online. Readme can be found at `arc_gis/README.md`
+    * `front_end/README.md`
+5. GIS Related Code using ArcGIS Online.
+    * `arc_gis/README.md`
 
 However, this README will focus on the main product: the chatbot application.
 
