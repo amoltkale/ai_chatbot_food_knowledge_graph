@@ -1,4 +1,4 @@
-# Nourish Knowledge Graph Analysis Capstone
+# Nourish Knowledge Graph Analysis and AI Chat Bot for Small Business Owners
 The repository is composed of a variety of scripts used to create the knowledge graph and integrate the knowledge graph with a LLM. On top of the integration, there is also code for a front facing website for users to log in to as well as a front end for the chat application. Please see below for more details on each directory and their contents.
 
 1. Arcgis
