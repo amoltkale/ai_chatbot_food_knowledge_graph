@@ -69,7 +69,7 @@ if not args.ui_dev:
     os.environ['OPENAI_API_KEY'] = ai_key
 
     # Establish user email
-    set_enviro_email(args.email)
+    #set_enviro_email(args.email)
 
     agent_chain = setup_agent_chain()
 
