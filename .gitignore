@@ -12,3 +12,4 @@ data*/*
 *.zip*
 **/*.ini
 *.html*
+/.idea/

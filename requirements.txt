@@ -1,5 +1,5 @@
 pyogrio==0.5.1 # Vectorized spatial vector file format I/O using GDAL/OGR
-numpy==1.19.5 
+#numpy==1.19.5
 psycopg2-binary==2.9.5 # Python-PostgreSQL Database Adapter
 ipywidgets==7.7.1
 hyper==0.7.0 #HTTP/2 Client for Python
